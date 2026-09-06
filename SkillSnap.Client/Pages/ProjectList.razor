@@ -1,0 +1,20 @@
+
+@foreach (var project in Projects)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@project.Title</h5>
+            <p class="card-text">@project.Description</p>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Project> Projects = new List<Project>
+    {
+        new Project { Title = "Project 1", Description = "Description for Project 1"  },
+        new Project { Title = "Project 2", Description = "Description for Project 2"  },
+        new Project { Title = "Project 3", Description = "Description for Project 3"  }
+    };
+
+}

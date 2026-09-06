@@ -1,0 +1,70 @@
+
+# === Konfigurationsdateien ===
+*/appsettings.json
+*/appsettings.Development.json
+*/appsettings.Production.json
+*/Properties/launchSettings.json
+*/Properties/PublishProfiles/
+
+# === Build- und Ausgabeverzeichnisse ===
+*/bin/
+*/obj/
+*/out/
+*/TestResults/
+*/publish/
+*/artifacts/
+
+# === IDE-spezifische Dateien ===
+# Visual Studio
+*/.vs
+/.vs/
+/.vs/*
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.sln.ide
+*.user
+# VS Code
+*/.vscode
+/.vscode/
+/.vscode/*
+
+# === Paketverwaltung ===
+*/packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+
+# === Webprojekte ===
+*/wwwroot/lib/
+
+# === ASP.NET Scaffolding ===
+ScaffoldingReadMe.txt
+
+# === Logs und temporäre Dateien ===
+*.log
+*/logs/
+*.tmp
+*.temp
+
+# === Datenbanken und Backups ===
+*.dbmdl
+*.bak
+*.backup
+*.db
+*.db-shm
+*.db-wal
+
+# === Debug/Analyse/Tools ===
+_ReSharper*/
+*.DotSettings.user
+*.pidb
+*.svclog
+*.pdb
+*.cache
+
+# === Sonstiges ===
+*.ide
+*.orig

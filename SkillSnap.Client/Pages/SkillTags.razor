@@ -1,0 +1,17 @@
+
+
+@foreach (var skill in Skills)
+{
+    <span class="badge rounded-pill bg-primary m-1">@skill.Name</span>
+}
+
+@code {
+    private List<Skill> Skills = new List<Skill>
+    {
+        new Skill { Name = "C#" },
+        new Skill { Name = "Blazor" },
+        new Skill { Name = "ASP.NET Core" },
+        new Skill { Name = "Entity Framework Core" },
+        new Skill { Name = "SQL" }
+    };
+}

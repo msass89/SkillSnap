@@ -1,0 +1,20 @@
+
+<div class="card">
+    <div class="card-body text-center">
+        <img src="@ProfilePictureUrl" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100" />
+        <h5 class="card-title">@Name</h5>
+        <p class="card-text">@Bio</p>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Name { get; set; } = "John Doe";
+
+    [Parameter]
+    public string Bio { get; set; } = "Software Developer with a passion for creating innovative solutions.";
+
+    [Parameter]
+    public string ProfilePictureUrl { get; set; } = "https://via.placeholder.com/100";
+}
