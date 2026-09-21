@@ -21,7 +21,7 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProjects()
     {
-        if (!_memoryCache.TryGetValue(CacheKeyProjects, out List<ProjectResponseDto>? cachedProjects))
+        if (!_memoryCache.TryGetValue(CacheKeyProjects, out List<ProjectResponseDto>? cachedProjectsDtoList))
         {
             // If the cache does not contain the projects, retrieve them from the database
             var items = await _context.Projects
@@ -41,15 +41,15 @@ public class ProjectsController : ControllerBase
 
             // Save data in cache
             _memoryCache.Set(CacheKeyProjects, items, cacheEntryOptions);
-            cachedProjects = items;
+            cachedProjectsDtoList = items;
         }
 
-        return Ok(cachedProjects);
+        return Ok(cachedProjectsDtoList);
     }
 
 
     //create a new project
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateProject([FromBody] CreateProjectDto createProjectDto)
     {
         if (!ModelState.IsValid)
@@ -79,7 +79,7 @@ public class ProjectsController : ControllerBase
         // invalidate cached projects list after creating a new project
         _memoryCache.Remove(CacheKeyProjects);
 
-        return Ok($"Project created successfully: {projectResponseDto.Title}");
+        return Ok(projectResponseDto);
     }
 
     //delete a project by id

@@ -21,7 +21,7 @@ public class SkillsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSkills()
     {
-        if (!_memoryCache.TryGetValue(CacheKeySkills, out List<SkillResponseDto>? cachedSkills))
+        if (!_memoryCache.TryGetValue(CacheKeySkills, out List<SkillResponseDto>? cachedSkillsDtoList))
         {
             // If the cache does not contain the skills, retrieve them from the database
             var items = await _context.Skills
@@ -40,15 +40,15 @@ public class SkillsController : ControllerBase
 
             // Save data in cache
             _memoryCache.Set(CacheKeySkills, items, cacheEntryOptions);
-            cachedSkills = items;
+            cachedSkillsDtoList = items;
         }
 
-        return Ok(cachedSkills);
+        return Ok(cachedSkillsDtoList);
     }
 
 
     //create a new skill
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateSkill([FromBody] CreateSkillDto createSkillDto)
     {
         if (!ModelState.IsValid)
@@ -77,7 +77,7 @@ public class SkillsController : ControllerBase
         // invalidate cached skills list after creating a new skill
         _memoryCache.Remove(CacheKeySkills);
 
-        return Ok($"Skill created successfully: {skillResponseDto.Name}");
+        return Ok(skillResponseDto);
     }
 
     //delete a skill by id
