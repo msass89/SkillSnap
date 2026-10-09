@@ -1,17 +1,17 @@
+@page "/skills"
+@inject SkillServices SkillService
 
-
-@foreach (var skill in Skills)
+@foreach (var skill in skills)
 {
     <span class="badge rounded-pill bg-primary m-1">@skill.Name</span>
 }
 
 @code {
-    private List<Skill> Skills = new List<Skill>
-    {
-        new Skill { Name = "C#" },
-        new Skill { Name = "Blazor" },
-        new Skill { Name = "ASP.NET Core" },
-        new Skill { Name = "Entity Framework Core" },
-        new Skill { Name = "SQL" }
-    };
+
+    private List<SkillResponseDto> skills;
+
+    protected override async Task OnInitializedAsync()
+    {
+        skills = await SkillService.GetSkillsAsync();
+    }
 }

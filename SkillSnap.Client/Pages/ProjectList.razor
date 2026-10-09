@@ -1,5 +1,8 @@
 
-@foreach (var project in Projects)
+@page "/projects"
+@inject ProjectServices ProjectService
+
+@foreach (var project in projects)
 {
     <div class="card mb-3">
         <div class="card-body">
@@ -10,11 +13,10 @@
 }
 
 @code {
-    private List<Project> Projects = new List<Project>
-    {
-        new Project { Title = "Project 1", Description = "Description for Project 1"  },
-        new Project { Title = "Project 2", Description = "Description for Project 2"  },
-        new Project { Title = "Project 3", Description = "Description for Project 3"  }
-    };
-
+    private List<ProjectResponseDto> projects;
+    protected override async Task OnInitializedAsync()
+    {
+        projects = await ProjectService.GetProjectsAsync();
+    }
 }
+
