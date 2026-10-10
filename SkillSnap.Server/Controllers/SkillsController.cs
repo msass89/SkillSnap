@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Shared;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("server/skills")]
 public class SkillsController : ControllerBase
