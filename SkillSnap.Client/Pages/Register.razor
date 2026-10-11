@@ -1,0 +1,44 @@
+@page "/register"
+
+<EditForm Model="@registrationModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator /> <!-- Enables validation based on attributes -->
+
+    <div class="form-container">
+        <h1 class="page-title">Register</h1>
+        <h2>Create a new account</h2>
+        <hr />
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="registrationModel.FullName" class="form-control" aria-required="true" placeholder="John Doe" />
+            <label asp-for="Input.DisplayName">Full Name</label>
+            <ValidationMessage For="@(() => registrationModel.FullName)" />
+        </div>
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="registrationModel.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+            <label asp-for="Input.Email">Email</label>
+            <ValidationMessage For="@(() => registrationModel.Email)" />
+        </div>
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="registrationModel.Password" type="password" class="form-control" aria-required="true" placeholder="password" />
+            <label asp-for="Input.Password">Password</label>
+            <ValidationMessage For="@(() => registrationModel.Password)" />
+        </div>
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="registrationModel.ConfirmPassword" type="password" class="form-control" aria-required="true" placeholder="password" />
+            <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+            <ValidationMessage For="@(() => registrationModel.ConfirmPassword)" />
+        </div>
+        <button id="registerSubmit" type="submit" class="btn btn-lg btn-primary">Register</button>
+    </div>
+
+</EditForm>
+
+@code {
+    private RegistrationModel registrationModel = new();
+
+    private void HandleValidSubmit()
+    {
+        
+    }
+}
+}

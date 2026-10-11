@@ -1,0 +1,44 @@
+@page "/login"
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator /> <!-- Enables validation based on attributes -->
+
+    <div class="form-container">
+        <h1 class="page-title">Login</h1>
+        <h2>Login with your account</h2>
+        <hr />
+
+        <div class="form-floating mb-4">
+            <InputText @bind-Value="loginModel.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+            <label class="form-label">Email</label>
+            <ValidationMessage For="@(() => loginModel.Email)" />
+        </div>
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="loginModel.Password" type="password" class="form-control" aria-required="true" placeholder="Enter password here" />
+            <label class="form-label">Password</label>
+            <ValidationMessage For="@(() => loginModel.Password)" />
+        </div>
+            <!--<div class="checkbox mb-3">
+                <label asp-for="Input.RememberMe" class="form-label">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                </label>
+            </div>-->
+        <div>
+            <button id="login-submit" type="submit" class="btn btn-lg btn-primary">Log in</button>
+        </div>
+        <div>
+            <p>
+                <a href="/Register" asp-page="/Register">Register as a new user</a>
+            </p>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+
+    private void HandleValidSubmit()
+    {
+        
+    }
+}

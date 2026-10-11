@@ -1,0 +1,12 @@
+@page "/profile"
+
+<ProfileCard Name="@portfolioUser.Name" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+
+@code {
+    private PortfolioUser portfolioUser = new PortfolioUser
+    {
+        Name = "Shawnta Padberg",
+        Bio = "Passionate full-stack developer",
+        ProfileImageUrl = "https://api.fakeidentitygenerator.com/avatar/women/30"
+    };
+}
