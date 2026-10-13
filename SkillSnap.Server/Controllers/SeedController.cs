@@ -4,7 +4,7 @@ using SkillSnap.Shared;
 namespace SkillSnap.Api.Controllers
 {
     [ApiController]
-    [Route("server/[controller]")]
+    [Route("server/seed")]
     public class SeedController : ControllerBase
     {
 

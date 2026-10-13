@@ -1,0 +1,15 @@
+@page "/profiles"
+
+@foreach (PortfolioUser portfolioUser in portfolioUserList) {
+    <ProfileCard Name="@portfolioUser.Name" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+}
+
+@code {
+
+    private List<PortfolioUser> portfolioUserList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //portfolioUserList = await ProjectService.GetProjectsAsync();
+    }
+}

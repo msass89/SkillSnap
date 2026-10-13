@@ -5,10 +5,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SkillSnap.Shared;
 
 
 [ApiController]
-[Route("api/auth")]
+[Route("server/auth")]
 public class AuthController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -23,19 +24,28 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> CreateUserAsync(string email, string password, string roleName)
+    public async Task<IActionResult> CreateUserAsync([FromBody] RegisterRequest request)
     {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             return BadRequest("Please enter email and password");
 
-        var user = new ApplicationUser { UserName = email, Email = email };
+        var user = new ApplicationUser { UserName = request.Email, Email = request.Email, FullName = request.FullName };
 
-        var userCreateResult = await _userManager.CreateAsync(user, password);
+        var userCreateResult = await _userManager.CreateAsync(user, request.Password);
 
         if(!userCreateResult.Succeeded)
-            return BadRequest("User creation was not successfull");
+        {
+            var errors = userCreateResult.Errors
+            .Select(e => e.Description);
+
+            return BadRequest(new
+            {
+                Message = "User creation failed",
+                Errors = errors
+            });
+        }
         
-        var addRoleResult = await _userManager.AddToRoleAsync(user, roleName);
+        var addRoleResult = await _userManager.AddToRoleAsync(user, request.RoleName);
 
         if(!addRoleResult.Succeeded)
             return BadRequest($"Failed to add a role to the user {user.UserName}");
@@ -43,7 +53,7 @@ public class AuthController : ControllerBase
         return Ok(new { Message = $"User {user.UserName} created successfully" });
     }
 
-    [HttpPost("post")]
+    [HttpPost("login")]
     public async Task<IResult> LoginAsync(string userName, string password)
     {
         var foundUser = await _userManager.FindByNameAsync(userName);
@@ -95,3 +105,11 @@ public class AuthController : ControllerBase
     }
 
 }
+
+/*public class RegisterRequest
+{
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string RoleName { get; set; } = string.Empty;
+}*/
