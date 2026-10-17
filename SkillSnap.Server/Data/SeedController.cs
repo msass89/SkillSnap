@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkillSnap.Shared;
 
-namespace SkillSnap.Api.Controllers
+namespace SkillSnap.Server.Seed
 {
     [ApiController]
+    [Authorize(Roles = "Admin")]
     [Route("server/seed")]
     public class SeedController : ControllerBase
     {

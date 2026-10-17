@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> CreateUserAsync([FromBody] RegisterRequest request)
+    public async Task<IActionResult> CreateUserAsync([FromBody] RegisterRequestDto request)
     {
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             return BadRequest("Please enter email and password");
@@ -34,16 +34,7 @@ public class AuthController : ControllerBase
         var userCreateResult = await _userManager.CreateAsync(user, request.Password);
 
         if(!userCreateResult.Succeeded)
-        {
-            var errors = userCreateResult.Errors
-            .Select(e => e.Description);
-
-            return BadRequest(new
-            {
-                Message = "User creation failed",
-                Errors = errors
-            });
-        }
+            return BadRequest("User creation failed");
         
         var addRoleResult = await _userManager.AddToRoleAsync(user, request.RoleName);
 
@@ -54,27 +45,28 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IResult> LoginAsync(string userName, string password)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequestDto request)
     {
-        var foundUser = await _userManager.FindByNameAsync(userName);
+        var user = await _userManager.FindByEmailAsync(request.Email);
 
-        if(foundUser == null)
-            return Results.Unauthorized();
+        if (user == null)
+            return Unauthorized(new TokenResponseDto { ErrorMessage = "Invalid Authentication" });
 
         var result = await _signInManager.PasswordSignInAsync(
-                userName: userName,
-                password: password,
+                userName: user.UserName,
+                password: request.Password,
                 isPersistent: false,
                 lockoutOnFailure: false
         );
 
         if (result.Succeeded)
         {
-            return Results.Ok(new { token = GenerateTokenString(foundUser) });
+            var token = await GenerateTokenString(user);
+
+            return Ok(new TokenResponseDto { IsAuthSuccessful = true, Token = token });
         }
         else
-            return Results.Unauthorized();
-        
+            return Unauthorized(new TokenResponseDto { ErrorMessage = "Invalid Authentication" });
     }
 
     private async Task<string> GenerateTokenString(ApplicationUser user)
@@ -83,13 +75,18 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, userRoles.ToString())
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Name, user.FullName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        foreach (var role in userRoles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var creds = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
@@ -101,15 +98,7 @@ public class AuthController : ControllerBase
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return tokenString;
+        return await Task.FromResult(tokenString);
     }
 
 }
-
-/*public class RegisterRequest
-{
-    public string FullName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-    public string RoleName { get; set; } = string.Empty;
-}*/

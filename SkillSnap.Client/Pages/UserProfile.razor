@@ -1,12 +1,24 @@
 @page "/userprofile"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
-<ProfileCard Name="@portfolioUser.Name" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+<AuthorizeView Roles="User">
+    <Authorized>
+        <!--The user: @context.User.FindFirst(ClaimTypes.Name).Value is authorized-->
+        <ProfileCard Name="@(context.User.Identity?.Name ?? "Unknown User")" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+    </Authorized>
+    <NotAuthorized>
+        The User is not authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+
 
 @code {
     private PortfolioUser portfolioUser = new PortfolioUser
     {
         Name = "Shawnta Padberg",
         Bio = "Passionate full-stack developer",
-        ProfileImageUrl = "https://api.fakeidentitygenerator.com/avatar/women/30"
+        ProfileImageUrl = "https://mockmind-api.uifaces.co/content/abstract/28.jpg"
     };
 }

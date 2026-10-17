@@ -1,8 +1,12 @@
 @page "/profiles"
 
-@foreach (PortfolioUser portfolioUser in portfolioUserList) {
-    <ProfileCard Name="@portfolioUser.Name" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+@if(portfolioUserList.Count != 0)
+{
+    @foreach (PortfolioUser portfolioUser in portfolioUserList) {
+        <ProfileCard Name="@portfolioUser.Name" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+    }
 }
+
 
 @code {
 

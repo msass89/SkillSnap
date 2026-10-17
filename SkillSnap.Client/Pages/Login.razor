@@ -1,5 +1,12 @@
 @page "/login"
 
+@if (ShowAuthError)
+{
+    <div class="alert alert-danger" role="alert">
+        <p>@Error</p>
+    </div>
+}
+
 <EditForm Model="@loginModel" OnValidSubmit="@HandleValidSubmit">
     <DataAnnotationsValidator /> <!-- Enables validation based on attributes -->
 
@@ -37,8 +44,34 @@
 @code {
     private LoginModel loginModel = new();
 
-    private void HandleValidSubmit()
+    [Inject]
+    public AuthService AuthService { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    public bool ShowAuthError { get; set; }
+    public string Error { get; set; }
+
+
+    private async Task HandleValidSubmit()
     {
-        
+        ShowAuthError = false;
+
+        var loginRequestDto = new LoginRequestDto(
+            email: loginModel.Email,
+            password: loginModel.Password
+        );
+
+        TokenResponseDto result = await AuthService.LoginAsync(loginRequestDto);
+        if (!result.IsAuthSuccessful)
+        {
+            Error = result.ErrorMessage;
+            ShowAuthError = true;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/userprofile");
+        }
     }
 }

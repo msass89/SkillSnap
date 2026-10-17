@@ -1,5 +1,5 @@
 @page "/register"
-@inject UserService userService
+@inject AuthService authService
 
 <EditForm Model="@registrationModel" OnValidSubmit="@HandleValidSubmit">
     <DataAnnotationsValidator /> <!-- Enables validation based on attributes -->
@@ -30,18 +30,26 @@
             <ValidationMessage For="@(() => registrationModel.ConfirmPassword)" />
         </div>
         <button id="registerSubmit" type="submit" class="btn btn-lg btn-primary">Register</button>
-        <p>@registrationResult</p>
+        <p>@ErrorMessage</p>
     </div>
 
 </EditForm>
 
 @code {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
     private RegistrationModel registrationModel = new();
-    string? registrationResult = "";
+    bool registrationResult = false;
+
+    string? ErrorMessage = "";
 
     private async Task HandleValidSubmit()
     {
-        registrationResult = await userService.CreateUser(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
+        registrationResult = await authService.CreateUser(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
+    
+        if(registrationResult)
+            ErrorMessage = "User registration was not successful";
+        else
+            NavigationManager.NavigateTo("/completeprofile");
     }
-}
 }

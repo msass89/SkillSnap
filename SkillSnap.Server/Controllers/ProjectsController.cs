@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Shared;
 using Microsoft.AspNetCore.Authorization;
 
-[Authorize(Roles = "Admin")]
+[Authorize]
 [ApiController]
 [Route("server/projects")]
 public class ProjectsController : ControllerBase

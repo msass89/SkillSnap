@@ -1,19 +1,22 @@
 using Microsoft.AspNetCore.Identity;
 
 //class to seed the roles into the database
-public static class IdentitySeed
+namespace SkillSnap.Server.Seed
 {
-    public static async Task SeedRolesAsync(IServiceProvider services)
+    public static class IdentitySeed
     {
-        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-        string[] roles = { "Admin", "User" };
-
-        foreach (var role in roles)
+        public static async Task SeedRolesAsync(IServiceProvider services)
         {
-            if (!await roleManager.RoleExistsAsync(role))
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+            string[] roles = { "Admin", "User" };
+
+            foreach (var role in roles)
             {
-                await roleManager.CreateAsync(new IdentityRole(role));
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
             }
         }
     }
