@@ -152,6 +152,9 @@ namespace SkillSnap.Server.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Bio")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -190,6 +193,10 @@ namespace SkillSnap.Server.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ProfileImageUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
@@ -212,33 +219,15 @@ namespace SkillSnap.Server.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("SkillSnap.Shared.PortfolioUser", b =>
+            modelBuilder.Entity("SkillSnap.Server.Models.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Bio")
+                    b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProfileImageUrl")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PortfolioUsers");
-                });
-
-            modelBuilder.Entity("SkillSnap.Shared.Project", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -247,25 +236,26 @@ namespace SkillSnap.Server.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PortfolioUserId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PortfolioUserId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("SkillSnap.Shared.Skill", b =>
+            modelBuilder.Entity("SkillSnap.Server.Models.Skill", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Level")
                         .IsRequired()
@@ -275,12 +265,9 @@ namespace SkillSnap.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PortfolioUserId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PortfolioUserId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Skills");
                 });
@@ -336,29 +323,29 @@ namespace SkillSnap.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SkillSnap.Shared.Project", b =>
+            modelBuilder.Entity("SkillSnap.Server.Models.Project", b =>
                 {
-                    b.HasOne("SkillSnap.Shared.PortfolioUser", "PortfolioUser")
+                    b.HasOne("SkillSnap.Server.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Projects")
-                        .HasForeignKey("PortfolioUserId")
+                        .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PortfolioUser");
+                    b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("SkillSnap.Shared.Skill", b =>
+            modelBuilder.Entity("SkillSnap.Server.Models.Skill", b =>
                 {
-                    b.HasOne("SkillSnap.Shared.PortfolioUser", "PortfolioUser")
+                    b.HasOne("SkillSnap.Server.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Skills")
-                        .HasForeignKey("PortfolioUserId")
+                        .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PortfolioUser");
+                    b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("SkillSnap.Shared.PortfolioUser", b =>
+            modelBuilder.Entity("SkillSnap.Server.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Projects");
 

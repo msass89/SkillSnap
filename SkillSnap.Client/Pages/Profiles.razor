@@ -1,16 +1,18 @@
 @page "/profiles"
+@using SkillSnap.Server.Models
+
 
 @if(portfolioUserList.Count != 0)
 {
-    @foreach (PortfolioUser portfolioUser in portfolioUserList) {
-        <ProfileCard Name="@portfolioUser.Name" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+    @foreach (PortfolioUserDto portfolioUser in portfolioUserList) {
+        <ProfileCard Name="@portfolioUser.FullName" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
     }
 }
 
 
 @code {
 
-    private List<PortfolioUser> portfolioUserList;
+    private List<PortfolioUserDto> portfolioUserList;
 
     protected override async Task OnInitializedAsync()
     {

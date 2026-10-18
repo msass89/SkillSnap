@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+/*using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace SkillSnap.Shared;
 
@@ -12,7 +12,7 @@ public class Skill
     public string Level { get; set; }
 
     [ForeignKey("PortfolioUser")]
-    public int PortfolioUserId { get; set; }
+    public string ApplicationUserId { get; set; }
 
-    public PortfolioUser PortfolioUser { get; set; } 
-}
+    public ApplicationUser ApplicationUser { get; set; } 
+}*/

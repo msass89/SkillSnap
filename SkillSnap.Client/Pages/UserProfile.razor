@@ -1,5 +1,6 @@
 @page "/userprofile"
 @using Microsoft.AspNetCore.Authorization
+@using SkillSnap.Server.Models
 @attribute [Authorize]
 
 <AuthorizeView Roles="User">
@@ -15,9 +16,9 @@
 
 
 @code {
-    private PortfolioUser portfolioUser = new PortfolioUser
+    private PortfolioUserDto portfolioUser = new PortfolioUserDto
     {
-        Name = "Shawnta Padberg",
+        FullName = "Shawnta Padberg",
         Bio = "Passionate full-stack developer",
         ProfileImageUrl = "https://mockmind-api.uifaces.co/content/abstract/28.jpg"
     };

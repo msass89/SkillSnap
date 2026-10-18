@@ -31,8 +31,7 @@ namespace SkillSnap.Client.Services
                 {
                     FullName = fullName,
                     Email = email,
-                    Password = password,
-                    RoleName = "User"
+                    Password = password
                 };
 
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync(

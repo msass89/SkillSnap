@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using SkillSnap.Server.Models;
 using SkillSnap.Shared;
 using Microsoft.AspNetCore.Authorization;
 
@@ -28,13 +29,13 @@ public class ProjectsController : ControllerBase
             // If the cache does not contain the projects, retrieve them from the database
             var items = await _context.Projects
                 .AsNoTracking() // Use AsNoTracking for read-only queries to improve performance
-                .Select(item => new ProjectResponseDto
+                .Select(project => new ProjectResponseDto
                 {
-                    Id = item.Id,
-                    Title = item.Title,
-                    Description = item.Description,
-                    ImageUrl = item.ImageUrl,
-                    PortfolioUserId = item.PortfolioUserId
+                    Id = project.Id,
+                    Title = project.Title,
+                    Description = project.Description,
+                    ImageUrl = project.ImageUrl,
+                    ApplicationUserId = project.ApplicationUserId
                 }).ToListAsync();
 
             // Set cache options
@@ -63,7 +64,7 @@ public class ProjectsController : ControllerBase
         {
             Title = createProjectDto.Title,
             Description = createProjectDto.Description,
-            PortfolioUserId = createProjectDto.PortfolioUserId
+            ApplicationUserId = createProjectDto.ApplicationUserId
         };
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();
@@ -75,7 +76,7 @@ public class ProjectsController : ControllerBase
             Title = project.Title,
             Description = project.Description,
             ImageUrl = project.ImageUrl,
-            PortfolioUserId = project.PortfolioUserId
+            ApplicationUserId = project.ApplicationUserId
         };
 
         // invalidate cached projects list after creating a new project

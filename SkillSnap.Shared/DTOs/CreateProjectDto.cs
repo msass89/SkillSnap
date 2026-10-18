@@ -14,5 +14,5 @@ public class CreateProjectDto
     public string ImageUrl { get; set; }
 
     [Required]
-    public int PortfolioUserId { get; set; }
+    public string ApplicationUserId { get; set; }
 }

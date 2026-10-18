@@ -11,5 +11,5 @@ public class CreateSkillDto
     public string Level { get; set; }
 
     [Required]
-    public int PortfolioUserId { get; set; }
+    public string ApplicationUserId { get; set; }
 }

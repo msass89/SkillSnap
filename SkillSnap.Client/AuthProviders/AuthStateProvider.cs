@@ -33,7 +33,7 @@ public class AuthStateProvider : AuthenticationStateProvider
         var identity = new ClaimsIdentity(
             claims,
             authenticationType: "jwtAuthType",
-            JwtRegisteredClaimNames.Name,
+            nameType: JwtRegisteredClaimNames.Name, 
             roleType: "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
         );
 

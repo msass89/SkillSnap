@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Shared;
+using SkillSnap.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 
 [Authorize]
@@ -28,12 +29,12 @@ public class SkillsController : ControllerBase
             // If the cache does not contain the skills, retrieve them from the database
             var items = await _context.Skills
                 .AsNoTracking() // Use AsNoTracking for read-only queries to improve performance
-                .Select(item => new SkillResponseDto
+                .Select(skill => new SkillResponseDto
                 {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Level = item.Level,
-                    PortfolioUserId = item.PortfolioUserId
+                    Id = skill.Id,
+                    Name = skill.Name,
+                    Level = skill.Level,
+                    ApplicationUserId = skill.ApplicationUserId
                 }).ToListAsync();
 
             // Set cache options
@@ -62,7 +63,7 @@ public class SkillsController : ControllerBase
         {
             Name = createSkillDto.Name,
             Level = createSkillDto.Level,
-            PortfolioUserId = createSkillDto.PortfolioUserId
+            ApplicationUserId = createSkillDto.ApplicationUserId
         };
         _context.Skills.Add(skill);
         await _context.SaveChangesAsync();
@@ -73,7 +74,7 @@ public class SkillsController : ControllerBase
             Id = skill.Id,
             Name = skill.Name,
             Level = skill.Level,
-            PortfolioUserId = skill.PortfolioUserId
+            ApplicationUserId = skill.ApplicationUserId
         };
 
         // invalidate cached skills list after creating a new skill

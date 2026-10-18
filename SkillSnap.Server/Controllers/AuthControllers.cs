@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
         if(!userCreateResult.Succeeded)
             return BadRequest("User creation failed");
         
-        var addRoleResult = await _userManager.AddToRoleAsync(user, request.RoleName);
+        var addRoleResult = await _userManager.AddToRoleAsync(user, "User");
 
         if(!addRoleResult.Succeeded)
             return BadRequest($"Failed to add a role to the user {user.UserName}");

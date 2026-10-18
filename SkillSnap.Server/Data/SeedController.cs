@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+/*using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkillSnap.Shared;
 
@@ -45,4 +45,4 @@ namespace SkillSnap.Server.Seed
             return Ok("Sample data inserted.");
         }
     }
-}
+}*/
