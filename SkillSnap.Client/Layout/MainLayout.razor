@@ -7,8 +7,15 @@
     <main>
         <div class="top-row px-4">
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-            <a href="/register" class="btn btn-success button">Register</a>
-            <a href="/login" class="btn btn-primary">Login</a>
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink href="/logout" class="btn btn-danger"> Logout </NavLink>
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink href="/register" class="btn btn-success">Register</NavLink>
+                    <NavLink href="/login" class="btn btn-primary" value="Login"> Login </NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
         <article class="content px-4">
             @Body
