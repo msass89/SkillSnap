@@ -37,24 +37,27 @@ builder.Services.AddCors( options =>
 
 //add JwtBearerAuthentication
 builder.Services.AddAuthentication(opt => 
-    { 
-        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
-        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
-    })
-    .AddJwtBearer(options =>
+{ 
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true, 
-            ValidIssuer = builder.Configuration["Jwt:Issuer"], 
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            RoleClaimType = ClaimTypes.Role
-        };
-    });
+        ValidateIssuer = true, 
+        ValidIssuer = builder.Configuration["Jwt:Issuer"], 
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        RoleClaimType = ClaimTypes.Role
+    };
+});
+
+// Register memory cache
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

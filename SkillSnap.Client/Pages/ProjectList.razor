@@ -1,22 +1,16 @@
-
-@page "/projects"
-@inject ProjectServices ProjectService
-
-@foreach (var project in projects)
-{
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title">@project.Title</h5>
-            <p class="card-text">@project.Description</p>
-        </div>
-    </div>
-}
+<label for="bio"><b>Projects:</b></label>
+<br />
+<div class="skill-container">
+    @foreach (var project in Projects)
+    {
+        <EditProject></EditProject>
+    }
+</div>
 
 @code {
-    private List<ProjectResponseDto> projects;
-    protected override async Task OnInitializedAsync()
-    {
-        projects = await ProjectService.GetProjectsAsync();
-    }
+
+    [Parameter]
+    public List<ProjectResponseDto> Projects { get; set; }
+    
 }
 

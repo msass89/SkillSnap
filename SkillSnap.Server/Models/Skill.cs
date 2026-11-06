@@ -10,7 +10,9 @@ namespace SkillSnap.Server.Models
 
         [Required]
         public string Name { get; set; }
-        public string Level { get; set; }
+
+        [Range(1, 5, ErrorMessage = "Der Level muss zwischen 1 und 5 liegen.")]
+        public int Level { get; set; }
 
         [ForeignKey("ApplicationUser")]
         public string ApplicationUserId { get; set; }

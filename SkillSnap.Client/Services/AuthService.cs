@@ -23,7 +23,7 @@ namespace SkillSnap.Client.Services
             _localStorage = localStorage;
         }
 
-        public async Task<bool> CreateUser(string fullName, string email, string password)
+        public async Task<bool> Register(string fullName, string email, string password)
         {
             try
             {

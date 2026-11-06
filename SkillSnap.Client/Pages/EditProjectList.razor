@@ -1,0 +1,33 @@
+<label for="projects"><b>Projects:</b></label>
+<br />
+<div id="projects" class="skill-container">
+    @foreach (var project in Projects)
+    {
+        <EditProject ProjectId="@project.Id" Title="@project.Title" Description="@project.Description" DeleteProject="NotifyParentDeleteProject"></EditProject>
+    }
+    <AddProject CreateProject="NotifyParentCreateProject"></AddProject>
+</div>
+
+@code {
+
+    [Parameter]
+    public List<ProjectResponseDto> Projects { get; set; }
+
+    [Parameter]
+    public EventCallback<CreateProjectRequestDto> CreateProject { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteProject { get; set; }
+
+    private async Task NotifyParentCreateProject(CreateProjectRequestDto project)
+    {
+        CreateProject.InvokeAsync(project);
+    }
+
+    private async Task NotifyParentDeleteProject(int projectId)
+    {
+        DeleteProject.InvokeAsync(projectId);
+    }
+
+}
+

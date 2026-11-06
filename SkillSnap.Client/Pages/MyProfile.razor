@@ -1,0 +1,195 @@
+@page "/myprofile"
+@using System.IdentityModel.Tokens.Jwt
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using SkillSnap.Shared
+@attribute [Authorize]
+@inject UserService userService;
+@inject SkillService skillService;
+@inject ProjectServices projectService;
+@inject AuthenticationStateProvider authenticationStateProvider;
+
+<AuthorizeView Roles="User">
+    <Authorized Context="authContext">
+        @if(portfolioUserDto == null)
+        {
+            <p>Load data...</p>
+        }
+        else
+        {
+            <EditForm Model="@completeProfileModel" OnSubmit="@SaveChanges">
+            <DataAnnotationsValidator />
+                <div class="form-container">
+                    <h1 class="text-center">Your profile</h1>
+                    <hr />
+                    <div class="form-group m-3 text-center">
+                        <EditProfilePicture ProfileImageUrl="@portfolioUserDto.ProfileImageUrl" PictureChanged="OnPictureChanged"/>
+                        <h5 class="card-title">@portfolioUserDto.FullName</h5>
+                    </div>
+                    <div class="form-group m-3">
+                        <EditBio Bio="@portfolioUserDto.Bio" BioChanged="OnBioChanged"/>
+                        <ValidationMessage For="@(() => completeProfileModel.Bio)" />
+                    </div>
+                    <div class="form-group m-3">
+                        <EditSkill skillResponseDtoList="@skillResponseDtoList" SkillAdded="OnSkillAdded" DeleteSkill="OnSkillDeleted"/>
+                    </div>
+                    <div class="form-group m-3">
+                        <EditProjectList Projects="@projectResponseDtoList" CreateProject="OnProjectAdded" DeleteProject="OnProjectDelete"></EditProjectList>
+                    </div>
+                    @if(!string.IsNullOrWhiteSpace(message))
+                    {
+                        <p>@message</p>
+                    }
+                </div>
+            </EditForm>
+        }
+    </Authorized>
+    <NotAuthorized>
+        The User is not authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string message = string.Empty;
+    private CompleteProfileModel completeProfileModel = new();
+    private PortfolioUserDto? portfolioUserDto;
+    private string? userId;
+
+    private List<SkillResponseDto>? skillResponseDtoList;
+    private List<ProjectResponseDto>? projectResponseDtoList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        userId = authState.User.FindFirst(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value;
+
+        if(userId != null)
+        {
+            portfolioUserDto = await userService.GetUserByIdAsync(userId);
+            skillResponseDtoList = await skillService.GetSkillsByUserAsync(userId);
+            projectResponseDtoList = await projectService.GetProjectsAsync(userId);
+        }
+    }
+
+    private async void OnBioChanged(string newBio)
+    {
+        portfolioUserDto?.Bio = newBio;
+
+        SaveChanges();
+    }
+
+    private async void OnPictureChanged(string newUrl)
+    {
+        portfolioUserDto?.ProfileImageUrl = newUrl;
+
+        SaveChanges();
+    }
+
+    private async void OnSkillAdded(CreateSkillRequestDto skill)
+    {
+        if (userId == null)
+            return;
+
+        var createSkillDto = new CreateSkillRequestDto
+        {
+            Name = skill.Name,
+            Level = skill.Level,
+            ApplicationUserId = userId
+        };
+
+        var response = await skillService.CreateSkillAsync(createSkillDto);
+
+        if (response == null)
+            return;
+
+        if(response.Success)
+        {
+            Console.WriteLine(response.Name, response.Level);
+            skillResponseDtoList?.Add(response);
+
+            StateHasChanged();
+        }
+
+        message = response.Message;
+    }
+
+    private async void OnSkillDeleted(int id)
+    {
+        var response = await skillService.DeleteSkillByIdAsync(id);
+
+        if(response.Success)
+        {
+            var item = skillResponseDtoList?.FirstOrDefault(item => item.Id == id);
+
+            if(item == null)
+                return;
+
+            skillResponseDtoList?.Remove(item);
+            StateHasChanged();
+        }
+
+        message = response.Message;
+    }
+
+    private async void OnProjectAdded(CreateProjectRequestDto project)
+    {
+        if (userId == null)
+            return;
+
+        var createProjectRequestDto = new CreateProjectRequestDto
+        {
+            Title = project.Title,
+            Description = project.Description,
+            ImageUrl = project.ImageUrl,
+            ApplicationUserId = userId
+        };
+
+        var response = await projectService.CreateProjectAsync(createProjectRequestDto);
+
+        if (response == null)
+            return;
+
+        if(response.Success)
+        {
+            projectResponseDtoList?.Add(response);
+
+            StateHasChanged();
+        }
+
+        message = response.Message;
+    }
+
+    private async void OnProjectDelete(int projectId)
+    {
+        var response = await projectService.DeleteProjectByIdAsync(projectId);
+
+        if(response.Success)
+        {
+            var project = projectResponseDtoList?.FirstOrDefault(project => project.Id == projectId);
+
+            if(project == null)
+                return;
+
+            projectResponseDtoList?.Remove(project);
+            StateHasChanged();
+        }
+
+        message = response.Message;
+    }
+
+
+    private async void SaveChanges()
+    {
+        if(portfolioUserDto == null || userId == null)
+            return;
+
+        PortfolioUserDto request = new PortfolioUserDto
+        {
+            FullName = portfolioUserDto.FullName,
+            Bio = portfolioUserDto.Bio,
+            ProfileImageUrl = portfolioUserDto.ProfileImageUrl
+        };
+
+        message = await userService.UpdateUserByIdAsync(userId, request);
+    }
+}

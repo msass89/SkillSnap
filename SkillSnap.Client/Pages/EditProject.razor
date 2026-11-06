@@ -1,0 +1,43 @@
+<div style="margin-bottom:10px;" @onmouseenter="ShowEditButtons" @onmouseleave="HideEditButtons">
+    <div class="card mb-1 card-body">
+        <h5 class="card-title">@Title</h5>
+        <p class="card-text">@Description</p>
+    </div>
+    <div style="display:flex;height:35px;">
+        @if(showEditButtons)
+        {
+            <button @onclick="NotifyParentToDelete"><img src="/img/bin.png" class="delete-icon"/></button>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int ProjectId { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteProject { get; set; }
+
+    private bool showEditButtons;
+    private void ShowEditButtons()
+    {
+        showEditButtons = true;
+    }
+
+    private void HideEditButtons()
+    {
+        showEditButtons = false;
+    }
+
+    private async Task NotifyParentToDelete()
+    {
+        DeleteProject.InvokeAsync(ProjectId);
+    }
+}

@@ -1,0 +1,49 @@
+
+<div class="skill-tag" @onmouseenter="ShowEditButtons" @onmouseleave="HideEditButtons">
+    <div class="skill-tag-group">
+        <p>@Name</p>
+        @if(showEditButtons)
+        {
+            <button @onclick="NotifyParentToDelete"><img src="/img/bin.png" class="delete-icon"/></button>
+        }
+    </div>
+    <div class="skill-tag-group">
+        @for (int i = 1; i <= 5; i++)
+        {
+            <span style="color: @(i <= Level ? "gold" : "lightgray");">
+                &#9733; <!--Star as an HTML-Entity-->
+            </span>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int SkillId { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public int Level { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteSkill { get; set; }
+
+    private bool showEditButtons = false;
+
+    private void ShowEditButtons()
+    {
+        showEditButtons = true;
+    }
+
+    private void HideEditButtons()
+    {
+        showEditButtons = false;
+    }
+
+    private void NotifyParentToDelete()
+    {
+        DeleteSkill.InvokeAsync(SkillId);
+    }
+}

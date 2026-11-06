@@ -40,12 +40,6 @@ public class AuthStateProvider : AuthenticationStateProvider
         var authenticatedUser = new ClaimsPrincipal(identity);
         var authState = Task.FromResult(new AuthenticationState(authenticatedUser));
 
-        /*foreach (var claim in claims)
-        {
-            Console.WriteLine($"{claim.Type} = {claim.Value}");
-        }*/
-
-        //Console.WriteLine($"Identity.Name = {identity.Name}");
         NotifyAuthenticationStateChanged(authState);
     }
 

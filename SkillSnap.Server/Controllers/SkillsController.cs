@@ -5,7 +5,7 @@ using SkillSnap.Shared;
 using SkillSnap.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 
-[Authorize]
+
 [ApiController]
 [Route("server/skills")]
 public class SkillsController : ControllerBase
@@ -20,30 +20,31 @@ public class SkillsController : ControllerBase
         _memoryCache = memoryCache;
     }
 
-    //get all skills
-    [HttpGet]
-    public async Task<IActionResult> GetSkills()
+    //get skills by userId
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetSkillsByUser(string userId)
     {
         if (!_memoryCache.TryGetValue(CacheKeySkills, out List<SkillResponseDto>? cachedSkillsDtoList))
         {
             // If the cache does not contain the skills, retrieve them from the database
-            var items = await _context.Skills
+            var skillItems = await _context.Skills
                 .AsNoTracking() // Use AsNoTracking for read-only queries to improve performance
+                .Where(skill => skill.ApplicationUserId == userId) //filter for a specific ApplicationUserId
                 .Select(skill => new SkillResponseDto
                 {
                     Id = skill.Id,
                     Name = skill.Name,
-                    Level = skill.Level,
-                    ApplicationUserId = skill.ApplicationUserId
-                }).ToListAsync();
+                    Level = skill.Level
+                })
+                .ToListAsync();
 
             // Set cache options
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromSeconds(30)); // Cache for 30 seconds
 
             // Save data in cache
-            _memoryCache.Set(CacheKeySkills, items, cacheEntryOptions);
-            cachedSkillsDtoList = items;
+            _memoryCache.Set(CacheKeySkills, skillItems, cacheEntryOptions);
+            cachedSkillsDtoList = skillItems;
         }
 
         return Ok(cachedSkillsDtoList);
@@ -52,52 +53,56 @@ public class SkillsController : ControllerBase
 
     //create a new skill
     [HttpPost("create")]
-    public async Task<IActionResult> CreateSkill([FromBody] CreateSkillDto createSkillDto)
+    public async Task<IActionResult> CreateSkill([FromBody] CreateSkillRequestDto createSkillDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
+        Console.WriteLine(createSkillDto.Name);
         var skill = new Skill
         {
             Name = createSkillDto.Name,
             Level = createSkillDto.Level,
             ApplicationUserId = createSkillDto.ApplicationUserId
         };
+
         _context.Skills.Add(skill);
-        await _context.SaveChangesAsync();
+        int result = await _context.SaveChangesAsync();
 
-        // return the created skill as a DTO
-        SkillResponseDto skillResponseDto = new SkillResponseDto
+        if(result > 0)
         {
-            Id = skill.Id,
-            Name = skill.Name,
-            Level = skill.Level,
-            ApplicationUserId = skill.ApplicationUserId
-        };
-
-        // invalidate cached skills list after creating a new skill
-        _memoryCache.Remove(CacheKeySkills);
-
-        return Ok(skillResponseDto);
+            // invalidate cached skills list after creating a new skill
+            _memoryCache.Remove(CacheKeySkills);
+            
+            return Ok(new SkillResponseDto { Id = skill.Id, Name = skill.Name, Level = skill.Level, Success = true, Message = "Skill created successfully" });
+        }
+        else
+        {
+            return BadRequest(new SkillResponseDto{ Success = false, Message = "Something went wrong"});
+        }
     }
+    
 
     //delete a skill by id
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteSkill(int id)
+    [HttpDelete("{skillId}")]
+    public async Task<IActionResult> DeleteSkill(int skillId)
     {
-        var item = await _context.Skills.FirstOrDefaultAsync(item => item.Id == id);
+        Console.WriteLine("SkillId " + skillId);
+        var item = await _context.Skills.FirstOrDefaultAsync(item => item.Id == skillId);
+
         if (item == null)
-        {
             return NotFound();
-        }
+
         _context.Skills.Remove(item);
-        await _context.SaveChangesAsync();
+        var result = await _context.SaveChangesAsync();
 
-        // invalidate cached skills list after deleting a skill
-        _memoryCache.Remove(CacheKeySkills);
+        if(result>0)
+        {
+            // invalidate cached skills list after deleting a skill
+            _memoryCache.Remove(CacheKeySkills);
 
-        return Ok($"Skill with ID {id} deleted successfully.");
+            return Ok(new DeleteSkillResponseDto{ Success = true, Message = "Skill deleted successfully."});
+        }
+        else
+        {
+            return BadRequest(new DeleteSkillResponseDto{ Success = false, Message = "Something went wrong."});
+        }
     }
 }

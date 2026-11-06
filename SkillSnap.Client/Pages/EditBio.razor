@@ -1,0 +1,50 @@
+
+<label for="bio"><b>Bio:</b></label>
+<br />
+@if(!editBio)
+{
+    @if(!string.IsNullOrEmpty(Bio))
+    {
+        <p class="card-text">@Bio</p>
+    }
+    else
+    {
+        <p class="card-text" style="font-style:italic">Please give a short description about yourself...</p>
+    }
+    <div style="display:flex;justify-content:flex-end;">
+        <button style="text-align:right" class="btn btn-primary" @onclick="ToggleEditing">Edit Bio</button>
+    </div>
+}
+else
+{
+    <InputTextArea class="big-input" id="bio" @bind-Value="@bioInput"></InputTextArea>
+    <div style="display:flex;justify-content:flex-end;">
+        <button style="text-align:right" class="btn btn-secondary" @onclick="ToggleEditing">Skip</button>
+        &nbsp;
+        <button style="text-align:right" class="btn btn-success" @onclick="NotifyParent">Save</button>
+    </div>
+}
+
+
+@code {
+    private bool editBio = false;
+    private string? bioInput = string.Empty;
+
+    [Parameter]
+    public string? Bio { get; set; }
+
+    [Parameter]
+    public EventCallback<string> BioChanged { get; set; }
+
+    private void ToggleEditing()
+    {
+        bioInput = Bio;
+        editBio = !editBio;
+    }
+
+    private async Task NotifyParent()
+    {
+        await BioChanged.InvokeAsync(bioInput);
+        editBio = false;
+    }
+}

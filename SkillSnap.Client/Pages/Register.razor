@@ -45,11 +45,23 @@
 
     private async Task HandleValidSubmit()
     {
-        registrationResult = await authService.CreateUser(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
-    
-        if(registrationResult)
+        registrationResult = await authService.Register(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
+
+        if(!registrationResult)
             ErrorMessage = "User registration was not successful";
         else
-            NavigationManager.NavigateTo("/completeprofile");
+        {
+            // login if registration was succesfull
+            TokenResponseDto responseDto = await authService.LoginAsync(new LoginRequestDto(registrationModel.Email, registrationModel.Password));
+            if (!responseDto.IsAuthSuccessful)
+            {
+                ErrorMessage = responseDto.ErrorMessage;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/myprofile");
+            }
+        }
+        
     }
 }

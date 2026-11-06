@@ -1,0 +1,66 @@
+
+@if(!addSkill)
+{
+    <div style="display:flex;justify-content:flex-end;">
+        <button style="text-align:right" class="btn btn-primary" @onclick="ToggleAddSkill">Add Skill</button>
+    </div>
+}
+else
+{
+    <div class="skill-tag">
+        <input @bind-value="@skillName"></input>
+        <select @bind="@skillLevel">
+            <option value="1">
+                &#9733;
+            </option>
+            <option value="2">
+                &#9733; &#9733;
+            </option>
+            <option value="3">
+                &#9733; &#9733; &#9733;
+            </option>
+            <option value="4">
+                &#9733; &#9733; &#9733; &#9733;
+            </option>
+            <option value="5">
+                &#9733; &#9733; &#9733; &#9733; &#9733;
+            </option>
+        </select>
+    </div>
+    <br />
+    <div style="display:flex;justify-content:flex-end;">
+        <button style="text-align:right" class="btn btn-secondary" @onclick="ToggleAddSkill">Skip</button>
+        &nbsp;
+        <button style="text-align:right" class="btn btn-success" @onclick="NotifyParent">Save</button>
+    </div>
+}
+
+
+@code {
+    private bool addSkill = false;
+
+    private string skillName = string.Empty;
+    private int skillLevel = 1;
+
+    [Parameter]
+    public EventCallback<CreateSkillRequestDto> SkillAdded { get; set; }
+
+
+    private void ToggleAddSkill()
+    {
+        addSkill = !addSkill;
+    }
+
+    private void NotifyParent()
+    {
+        var skill = new CreateSkillRequestDto
+        {
+            Name = skillName,
+            Level = skillLevel,
+            ApplicationUserId = string.Empty
+        };
+
+        SkillAdded.InvokeAsync(skill);
+        addSkill = false;
+    }
+}

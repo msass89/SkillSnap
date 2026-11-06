@@ -5,7 +5,7 @@ using SkillSnap.Server.Models;
 using SkillSnap.Shared;
 using Microsoft.AspNetCore.Authorization;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("server/projects")]
 public class ProjectsController : ControllerBase
@@ -21,21 +21,21 @@ public class ProjectsController : ControllerBase
     }
 
     //get all projects
-    [HttpGet]
-    public async Task<IActionResult> GetProjects()
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetProjectsByUserId(string userId)
     {
         if (!_memoryCache.TryGetValue(CacheKeyProjects, out List<ProjectResponseDto>? cachedProjectsDtoList))
         {
             // If the cache does not contain the projects, retrieve them from the database
             var items = await _context.Projects
                 .AsNoTracking() // Use AsNoTracking for read-only queries to improve performance
+                .Where(project => project.ApplicationUserId == userId) //filter for a specific ApplicationUserId
                 .Select(project => new ProjectResponseDto
                 {
                     Id = project.Id,
                     Title = project.Title,
                     Description = project.Description,
-                    ImageUrl = project.ImageUrl,
-                    ApplicationUserId = project.ApplicationUserId
+                    ImageUrl = project.ImageUrl
                 }).ToListAsync();
 
             // Set cache options
@@ -53,12 +53,14 @@ public class ProjectsController : ControllerBase
 
     //create a new project
     [HttpPost("create")]
-    public async Task<IActionResult> CreateProject([FromBody] CreateProjectDto createProjectDto)
+    public async Task<IActionResult> CreateProject([FromBody] CreateProjectRequestDto createProjectDto)
     {
-        if (!ModelState.IsValid)
+        /*if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
-        }
+        }*/
+
+        Console.WriteLine("Serverside Id " + createProjectDto.ApplicationUserId);
 
         var project = new Project
         {
@@ -66,40 +68,58 @@ public class ProjectsController : ControllerBase
             Description = createProjectDto.Description,
             ApplicationUserId = createProjectDto.ApplicationUserId
         };
+
         _context.Projects.Add(project);
-        await _context.SaveChangesAsync();
+        int result = await _context.SaveChangesAsync();
 
-        // return the created project as a DTO
-        ProjectResponseDto projectResponseDto = new ProjectResponseDto
+        if(result > 0)
         {
-            Id = project.Id,
-            Title = project.Title,
-            Description = project.Description,
-            ImageUrl = project.ImageUrl,
-            ApplicationUserId = project.ApplicationUserId
-        };
+            // invalidate cached projects list after creating a new project
+            _memoryCache.Remove(CacheKeyProjects);
 
-        // invalidate cached projects list after creating a new project
-        _memoryCache.Remove(CacheKeyProjects);
+            // return the created project as a DTO
+            ProjectResponseDto projectResponseDto = new ProjectResponseDto
+            {
+                Id = project.Id,
+                Title = project.Title,
+                Description = project.Description,
+                ImageUrl = project.ImageUrl,
+                Success = true,
+                Message = "Project created successfully"
+            };
 
-        return Ok(projectResponseDto);
+            return Ok(projectResponseDto);
+        }
+        else
+        {
+            Console.WriteLine("No success");
+            return BadRequest(new SkillResponseDto { Success = false, Message = "Something went wrong"});
+        }
+        
     }
 
     //delete a project by id
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProject(int id)
     {
-        var item = await _context.Projects.FirstOrDefaultAsync(item => item.Id == id);
-        if (item == null)
+        var projectItem = await _context.Projects.FirstOrDefaultAsync(item => item.Id == id);
+        if (projectItem == null)
         {
             return NotFound();
         }
-        _context.Projects.Remove(item);
-        await _context.SaveChangesAsync();
+        _context.Projects.Remove(projectItem);
+        var result = await _context.SaveChangesAsync();
 
-        // invalidate cached projects list after deleting a project
-        _memoryCache.Remove(CacheKeyProjects);
+        if(result > 0)
+        {
+            // invalidate cached projects list after deleting a project
+            _memoryCache.Remove(CacheKeyProjects);
 
-        return Ok($"Project with ID {id} deleted successfully.");
+            return Ok(new DeleteProjectResponseDto{ Success = true, Message = $"Project with ID {id} deleted successfully."});
+        }
+        else
+        {
+            return BadRequest(new DeleteProjectResponseDto{ Success = false, Message = "Something went wrong"});
+        }
     }
 }

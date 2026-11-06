@@ -1,20 +1,34 @@
 
 <div class="card">
     <div class="card-body text-center">
-        <img src="@ProfilePictureUrl" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100" />
-        <h5 class="card-title">@Name</h5>
-        <p class="card-text">@Bio</p>
+        @if(string.IsNullOrWhiteSpace(ProfilePictureUrl))
+        {
+            <img src="https://mockmind-api.uifaces.co/content/abstract/28.jpg" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100" />
+        }
+        else
+        {
+            <img src="@ProfilePictureUrl" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100" />
+        }
+        @if(Name != null)
+        {
+            <h5 class="card-title">@Name</h5>
+        }
+        @if(Bio != null)
+        {
+            <p class="card-text">@Bio</p>
+        }
     </div>
 </div>
 
 @code {
 
     [Parameter]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [Parameter]
-    public string Bio { get; set; }
+    public string? Bio { get; set; }
 
     [Parameter]
-    public string ProfilePictureUrl { get; set; }
+    public string? ProfilePictureUrl { get; set; }
+
 }

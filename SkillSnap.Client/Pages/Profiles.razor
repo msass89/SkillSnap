@@ -1,13 +1,25 @@
 @page "/profiles"
-@using SkillSnap.Server.Models
+@using SkillSnap.Shared
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
-
-@if(portfolioUserList.Count != 0)
-{
-    @foreach (PortfolioUserDto portfolioUser in portfolioUserList) {
-        <ProfileCard Name="@portfolioUser.FullName" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
-    }
-}
+<AuthorizeView Roles="User">
+    <Authorized>
+        @if(portfolioUserList != null && portfolioUserList?.Count != 0)
+        {
+            @foreach (PortfolioUserDto portfolioUser in portfolioUserList) {
+                if(portfolioUser != null)
+                {
+                    <ProfileCard Name="@portfolioUser.FullName" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+                }
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        The User is not authorized
+    </NotAuthorized>
+</AuthorizeView>
+@inject UserService userService;
 
 
 @code {
@@ -16,6 +28,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //portfolioUserList = await ProjectService.GetProjectsAsync();
+        portfolioUserList = await userService.GetAllUsersAsync();
     }
 }
