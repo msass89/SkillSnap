@@ -1,5 +1,6 @@
 @page "/myprofile"
 @using System.IdentityModel.Tokens.Jwt
+@using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using SkillSnap.Shared
@@ -61,7 +62,7 @@
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        userId = authState.User.FindFirst(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value;
+        userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
         if(userId != null)
         {
@@ -119,12 +120,12 @@
 
         if(response.Success)
         {
-            var item = skillResponseDtoList?.FirstOrDefault(item => item.Id == id);
+            var skill = skillResponseDtoList?.FirstOrDefault(skill => skill.Id == id);
 
-            if(item == null)
+            if(skill == null)
                 return;
 
-            skillResponseDtoList?.Remove(item);
+            skillResponseDtoList?.Remove(skill);
             StateHasChanged();
         }
 

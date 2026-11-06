@@ -9,7 +9,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+// sets the base adress to the Api-port
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5029/") });
 
 builder.Services.AddScoped<ProjectServices>();
 builder.Services.AddScoped<SkillService>();
@@ -18,6 +19,11 @@ builder.Services.AddScoped<UserService>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore(); //adds authorization service
-builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+
+
+builder.Services.AddScoped<AuthStateProvider>();
+
+builder.Services.AddScoped<AuthenticationStateProvider>(
+    sp => sp.GetRequiredService<AuthStateProvider>());
 
 await builder.Build().RunAsync();

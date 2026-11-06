@@ -15,7 +15,7 @@ public class ProjectServices
     public async Task<List<ProjectResponseDto>> GetProjectsAsync(string userId)
     {
         try {
-            var response = await _httpClient.GetAsync($"http://localhost:5029/server/projects/{userId}");
+            var response = await _httpClient.GetAsync($"server/projects/{userId}");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -41,9 +41,8 @@ public class ProjectServices
     {
         try
         {
-            Console.WriteLine("UserId " + createProjectRequestDto.ApplicationUserId);
             var jsonContent = new StringContent(JsonSerializer.Serialize(createProjectRequestDto), System.Text.Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("http://localhost:5029/server/projects/create", jsonContent);
+            var response = await _httpClient.PostAsync("server/projects/create", jsonContent);
 
             Console.WriteLine("Response status code " + response.StatusCode);
             
@@ -71,7 +70,7 @@ public class ProjectServices
         {
             try
             {
-                var url = $"http://localhost:5029/server/projects/{projectlId}";
+                var url = $"server/projects/{projectlId}";
                 var response = await _httpClient.DeleteAsync(url);
 
                 response.EnsureSuccessStatusCode();

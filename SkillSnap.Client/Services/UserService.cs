@@ -16,7 +16,7 @@ namespace SkillSnap.Client.Services
         public async Task<List<PortfolioUserDto>> GetAllUsersAsync()
         {
             try {
-                var response = await _httpClient.GetAsync("http://localhost:5029/server/user");
+                var response = await _httpClient.GetAsync("server/user");
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -42,7 +42,7 @@ namespace SkillSnap.Client.Services
         {
             try
             {
-                var url = $"http://localhost:5029/server/user/{id}";
+                var url = $"server/user/{id}";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -68,7 +68,7 @@ namespace SkillSnap.Client.Services
         {
             try
             {
-                var url = $"http://localhost:5029/server/user/{id}";
+                var url = $"server/user/{id}";
                 var response = await _httpClient.PutAsJsonAsync(url, portfolioUserDto);
 
                 response.EnsureSuccessStatusCode();

@@ -19,16 +19,29 @@ public class AuthStateProvider : AuthenticationStateProvider
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var token = await _localStorage.GetItemAsync<string>("authToken");
+
         if (string.IsNullOrWhiteSpace(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
             return _anonymous;
+        }
+
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType")));
     }
 
     // use this method as soon as the user logs in
-    public void NotifyUserAuthentication(string token)
+    public async void NotifyUserAuthentication(string token)
     {
+        //saves the token in the local storage
+        await _localStorage.SetItemAsync("authToken", token);
+
         var claims = JwtParser.ParseClaimsFromJwt(token);
+
+        //sets the default authorization request header
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
 
         var identity = new ClaimsIdentity(
             claims,
@@ -43,10 +56,15 @@ public class AuthStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(authState);
     }
 
-    //  as soon as the user logs out
-    public void NotifyUserLogout()
+    //  as soon as the user logs out, remove the token from the local storage an the default request header
+    public async void NotifyUserLogout()
     {
+        await _localStorage.RemoveItemAsync("authToken");
+
         var authState = Task.FromResult(_anonymous);
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+
         NotifyAuthenticationStateChanged(authState);
     }
 }

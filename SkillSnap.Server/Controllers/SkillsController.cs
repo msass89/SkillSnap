@@ -4,8 +4,10 @@ using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Shared;
 using SkillSnap.Server.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
-
+[Authorize]
 [ApiController]
 [Route("server/skills")]
 public class SkillsController : ControllerBase
@@ -55,7 +57,11 @@ public class SkillsController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateSkill([FromBody] CreateSkillRequestDto createSkillDto)
     {
-        Console.WriteLine(createSkillDto.Name);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (currentUserId != createSkillDto.ApplicationUserId)
+            return Forbid();
+            
         var skill = new Skill
         {
             Name = createSkillDto.Name,
@@ -84,13 +90,16 @@ public class SkillsController : ControllerBase
     [HttpDelete("{skillId}")]
     public async Task<IActionResult> DeleteSkill(int skillId)
     {
-        Console.WriteLine("SkillId " + skillId);
-        var item = await _context.Skills.FirstOrDefaultAsync(item => item.Id == skillId);
+        var skill = await _context.Skills.FirstOrDefaultAsync(skill => skill.Id == skillId);
 
-        if (item == null)
+        if (skill == null)
             return NotFound();
 
-        _context.Skills.Remove(item);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId != skill.ApplicationUserId)
+            return Forbid();
+
+        _context.Skills.Remove(skill);
         var result = await _context.SaveChangesAsync();
 
         if(result>0)

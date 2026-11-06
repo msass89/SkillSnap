@@ -15,7 +15,7 @@ namespace SkillSnap.Client.Services
         public async Task<List<SkillResponseDto>> GetSkillsByUserAsync(string userId)
         {
             try {
-                var response = await _httpClient.GetAsync($"http://localhost:5029/server/skills/{userId}");
+                var response = await _httpClient.GetAsync($"server/skills/{userId}");
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -41,7 +41,7 @@ namespace SkillSnap.Client.Services
             try
             {
                 var jsonContent = new StringContent(JsonSerializer.Serialize(createSkillDto), System.Text.Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync("http://localhost:5029/server/skills/create", jsonContent);
+                var response = await _httpClient.PostAsync("server/skills/create", jsonContent);
 
                 response.EnsureSuccessStatusCode();
 
@@ -69,7 +69,7 @@ namespace SkillSnap.Client.Services
         {
             try
             {
-                var url = $"http://localhost:5029/server/skills/{skillId}";
+                var url = $"server/skills/{skillId}";
                 var response = await _httpClient.DeleteAsync(url);
 
                 response.EnsureSuccessStatusCode();

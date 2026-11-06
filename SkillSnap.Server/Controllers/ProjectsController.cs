@@ -4,8 +4,10 @@ using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Server.Models;
 using SkillSnap.Shared;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("server/projects")]
 public class ProjectsController : ControllerBase
@@ -55,12 +57,16 @@ public class ProjectsController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateProject([FromBody] CreateProjectRequestDto createProjectDto)
     {
+        //user are only allowed to create projects for their own profile
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (currentUserId != createProjectDto.ApplicationUserId)
+            return Forbid();
+
         /*if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }*/
-
-        Console.WriteLine("Serverside Id " + createProjectDto.ApplicationUserId);
 
         var project = new Project
         {
@@ -102,12 +108,18 @@ public class ProjectsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProject(int id)
     {
-        var projectItem = await _context.Projects.FirstOrDefaultAsync(item => item.Id == id);
-        if (projectItem == null)
-        {
+        //users are only allowed the delete projects for their own profile
+        var project = await _context.Projects.FirstOrDefaultAsync(project => project.Id == id);
+
+        if (project == null)
             return NotFound();
-        }
-        _context.Projects.Remove(projectItem);
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (currentUserId != project.ApplicationUserId)
+            return Forbid();
+        
+        _context.Projects.Remove(project);
         var result = await _context.SaveChangesAsync();
 
         if(result > 0)

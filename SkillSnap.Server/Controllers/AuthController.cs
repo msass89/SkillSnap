@@ -6,7 +6,6 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SkillSnap.Shared;
-using Microsoft.EntityFrameworkCore;
 
 
 [ApiController]
@@ -67,7 +66,7 @@ public class AuthController : ControllerBase
             return Ok(new TokenResponseDto { IsAuthSuccessful = true, Token = token });
         }
         else
-            return Unauthorized(new TokenResponseDto { ErrorMessage = "Invalid Authentication" });
+            return Unauthorized(new TokenResponseDto { IsAuthSuccessful = false, ErrorMessage = "Invalid Authentication" });
     }
 
     private async Task<string> GenerateTokenString(ApplicationUser user)
@@ -76,7 +75,7 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Name, user.FullName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
@@ -102,5 +101,4 @@ public class AuthController : ControllerBase
 
         return await Task.FromResult(tokenString);
     }
-
 }
