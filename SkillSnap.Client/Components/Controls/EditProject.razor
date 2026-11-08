@@ -17,10 +17,10 @@
     public int ProjectId { get; set; }
 
     [Parameter]
-    public string Title { get; set; }
+    public string Title { get; set; } = "";
 
     [Parameter]
-    public string Description { get; set; }
+    public string Description { get; set; } = "";
 
     [Parameter]
     public EventCallback<int> DeleteProject { get; set; }
@@ -38,6 +38,6 @@
 
     private async Task NotifyParentToDelete()
     {
-        DeleteProject.InvokeAsync(ProjectId);
+        await DeleteProject.InvokeAsync(ProjectId);
     }
 }

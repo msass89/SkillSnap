@@ -1,0 +1,70 @@
+
+@if(!addSkill)
+{
+    <div style="display:flex;justify-content:flex-end;">
+        <button style="text-align:right" class="btn btn-primary" @onclick="ToggleAddSkill">Add Skill</button>
+    </div>
+}
+else
+{
+    <EditForm Model="@editSkillModel" OnValidSubmit="NotifyParent">
+        <DataAnnotationsValidator/>
+
+        <div class="skill-tag">
+            <input @bind-value="@editSkillModel.SkillName"></input>
+            <select @bind="@editSkillModel.SkillLevel">
+                <option value="1">
+                    &#9733;
+                </option>
+                <option value="2">
+                    &#9733; &#9733;
+                </option>
+                <option value="3">
+                    &#9733; &#9733; &#9733;
+                </option>
+                <option value="4">
+                    &#9733; &#9733; &#9733; &#9733;
+                </option>
+                <option value="5">
+                    &#9733; &#9733; &#9733; &#9733; &#9733;
+                </option>
+            </select>
+        </div>
+        <ValidationMessage For="@( () => editSkillModel.SkillName)"/>
+        <br />
+        <div style="display:flex;justify-content:flex-end;">
+            <button style="text-align:right" type="button" class="btn btn-secondary" @onclick="ToggleAddSkill">Skip</button>
+            &nbsp;
+            <button style="text-align:right" type="submit" class="btn btn-success">Save</button>
+        </div>
+    </EditForm>
+}
+ 
+
+@code {
+    private bool addSkill = false;
+    private EditSkillModel editSkillModel = new EditSkillModel();
+
+    [Parameter]
+    public EventCallback<CreateSkillRequestDto> SkillAdded { get; set; }
+
+
+    private void ToggleAddSkill()
+    {
+        addSkill = !addSkill;
+    }
+
+    private async Task NotifyParent()
+    {
+        Console.WriteLine("Notify parent");
+        var skill = new CreateSkillRequestDto
+        {
+            Name = editSkillModel.SkillName,
+            Level = editSkillModel.SkillLevel,
+            ApplicationUserId = string.Empty
+        };
+
+        await SkillAdded.InvokeAsync(skill);
+        addSkill = false;
+    }
+}

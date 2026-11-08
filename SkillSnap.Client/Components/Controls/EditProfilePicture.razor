@@ -1,0 +1,56 @@
+<img src="@ProfileImageUrl" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100" @onclick="@ToggleEditing"/>
+@if(showInput)
+{
+    <EditForm Model="@editProfilePictureModel" OnValidSubmit="NotifyParent" OnInvalidSubmit="SetProfileImageToDefault">
+        <DataAnnotationsValidator/>
+
+        <br />
+        <label for="image-url">New profile image url: </label>
+        <br />
+        <InputText style="width:90%" id="image-url" @bind-Value="@editProfilePictureModel.ProfileImageUrl"></InputText>
+        <ValidationMessage For="@(() => editProfilePictureModel.ProfileImageUrl)" />
+        <br />
+        <button type="button" class="btn btn-secondary" @onclick="@ToggleEditing">Skip</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <br />
+        <br />
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public string? ProfileImageUrl { get; set; }
+
+    private EditProfilePictureModel editProfilePictureModel = new EditProfilePictureModel();
+    private bool showInput = false;
+    private string imageUrlInput = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> PictureChanged { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if(string.IsNullOrWhiteSpace(ProfileImageUrl))
+        {
+            ProfileImageUrl = "https://mockmind-api.uifaces.co/content/abstract/28.jpg";
+        }
+    }
+
+    private void ToggleEditing()
+    {
+        editProfilePictureModel.ProfileImageUrl = ProfileImageUrl ?? "";
+        showInput = !showInput;
+    }
+
+    private async Task SetProfileImageToDefault()
+    {
+        await PictureChanged.InvokeAsync("https://mockmind-api.uifaces.co/content/abstract/28.jpg");
+        showInput = false;
+    }
+
+    private async Task NotifyParent()
+    {
+        await PictureChanged.InvokeAsync(editProfilePictureModel.ProfileImageUrl);
+        showInput = false;
+    }
+}

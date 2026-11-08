@@ -72,14 +72,14 @@ public class UserController : ControllerBase
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new SuccessResponseDto { Success = false, Message = "Something went wrong"});
             }
             else
             {
-                return Ok();
+                return Ok(new SuccessResponseDto { Success = true, Message = "User updated successfully."});
             }      
         }
 
-        return NotFound();
+        return NotFound(new SuccessResponseDto { Success = false, Message = "Something went wrong"});
     }
 }

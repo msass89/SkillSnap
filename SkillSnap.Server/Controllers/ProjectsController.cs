@@ -127,11 +127,11 @@ public class ProjectsController : ControllerBase
             // invalidate cached projects list after deleting a project
             _memoryCache.Remove(CacheKeyProjects);
 
-            return Ok(new DeleteProjectResponseDto{ Success = true, Message = $"Project with ID {id} deleted successfully."});
+            return Ok(new SuccessResponseDto{ Success = true, Message = $"Project deleted successfully."});
         }
         else
         {
-            return BadRequest(new DeleteProjectResponseDto{ Success = false, Message = "Something went wrong"});
+            return BadRequest(new SuccessResponseDto{ Success = false, Message = "Something went wrong"});
         }
     }
 }

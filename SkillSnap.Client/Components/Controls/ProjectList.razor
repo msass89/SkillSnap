@@ -1,0 +1,19 @@
+<label for="bio"><b>Projects:</b></label>
+<br />
+<div class="skill-container">
+    @if(Projects != null || Projects?.Count == 0)
+    {
+        @foreach (var project in Projects)
+        {
+            <EditProject/>
+        }
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public List<ProjectResponseDto>? Projects { get; set; } 
+    
+}
+

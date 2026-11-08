@@ -23,7 +23,7 @@ namespace SkillSnap.Client.Services
             _localStorage = localStorage;
         }
 
-        public async Task<bool> Register(string fullName, string email, string password)
+        public async Task<bool> RegisterAsync(string fullName, string email, string password)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace SkillSnap.Client.Services
             }
         }
 
-        public async Task Logout()
+        public async Task LogoutAsync()
         {
             // remove the token from the local storage and from the default authorization header
             await _localStorage.RemoveItemAsync("authToken");

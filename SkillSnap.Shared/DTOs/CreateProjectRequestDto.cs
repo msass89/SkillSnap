@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+
 namespace SkillSnap.Shared;
 
 // DTO for creating a new project, including title and description

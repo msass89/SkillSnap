@@ -1,5 +1,4 @@
 @page "/myprofile"
-@using System.IdentityModel.Tokens.Jwt
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -18,8 +17,8 @@
         }
         else
         {
-            <EditForm Model="@completeProfileModel" OnSubmit="@SaveChanges">
-            <DataAnnotationsValidator />
+            <!--<EditForm Model="@completeProfileModel" OnSubmit="@SaveChanges">
+                <DataAnnotationsValidator />-->
                 <div class="form-container">
                     <h1 class="text-center">Your profile</h1>
                     <hr />
@@ -29,7 +28,6 @@
                     </div>
                     <div class="form-group m-3">
                         <EditBio Bio="@portfolioUserDto.Bio" BioChanged="OnBioChanged"/>
-                        <ValidationMessage For="@(() => completeProfileModel.Bio)" />
                     </div>
                     <div class="form-group m-3">
                         <EditSkill skillResponseDtoList="@skillResponseDtoList" SkillAdded="OnSkillAdded" DeleteSkill="OnSkillDeleted"/>
@@ -39,10 +37,10 @@
                     </div>
                     @if(!string.IsNullOrWhiteSpace(message))
                     {
-                        <p>@message</p>
+                        <p style="@messageColor">@message</p>
                     }
                 </div>
-            </EditForm>
+            <!--</EditForm>-->
         }
     </Authorized>
     <NotAuthorized>
@@ -52,7 +50,7 @@
 
 @code {
     private string message = string.Empty;
-    private CompleteProfileModel completeProfileModel = new();
+    private string messageColor = string.Empty;
     private PortfolioUserDto? portfolioUserDto;
     private string? userId;
 
@@ -64,6 +62,8 @@
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
+        Console.WriteLine("UserId: " + userId);
+
         if(userId != null)
         {
             portfolioUserDto = await userService.GetUserByIdAsync(userId);
@@ -72,21 +72,21 @@
         }
     }
 
-    private async void OnBioChanged(string newBio)
+    private async Task OnBioChanged(string newBio)
     {
         portfolioUserDto?.Bio = newBio;
 
-        SaveChanges();
+        await SaveProfileChanges();
     }
 
-    private async void OnPictureChanged(string newUrl)
+    private async Task OnPictureChanged(string newUrl)
     {
         portfolioUserDto?.ProfileImageUrl = newUrl;
 
-        SaveChanges();
+        await SaveProfileChanges();
     }
 
-    private async void OnSkillAdded(CreateSkillRequestDto skill)
+    private async Task OnSkillAdded(CreateSkillRequestDto skill)
     {
         if (userId == null)
             return;
@@ -111,10 +111,10 @@
             StateHasChanged();
         }
 
-        message = response.Message;
+        UpdateMessage(response.Success, response.Message);
     }
 
-    private async void OnSkillDeleted(int id)
+    private async Task OnSkillDeleted(int id)
     {
         var response = await skillService.DeleteSkillByIdAsync(id);
 
@@ -129,10 +129,10 @@
             StateHasChanged();
         }
 
-        message = response.Message;
+        UpdateMessage(response.Success, response.Message);
     }
 
-    private async void OnProjectAdded(CreateProjectRequestDto project)
+    private async Task OnProjectAdded(CreateProjectRequestDto project)
     {
         if (userId == null)
             return;
@@ -157,10 +157,10 @@
             StateHasChanged();
         }
 
-        message = response.Message;
+        UpdateMessage(response.Success, response.Message);
     }
 
-    private async void OnProjectDelete(int projectId)
+    private async Task OnProjectDelete(int projectId)
     {
         var response = await projectService.DeleteProjectByIdAsync(projectId);
 
@@ -175,11 +175,11 @@
             StateHasChanged();
         }
 
-        message = response.Message;
+        UpdateMessage(response.Success, response.Message);
     }
 
 
-    private async void SaveChanges()
+    private async Task SaveProfileChanges()
     {
         if(portfolioUserDto == null || userId == null)
             return;
@@ -191,6 +191,14 @@
             ProfileImageUrl = portfolioUserDto.ProfileImageUrl
         };
 
-        message = await userService.UpdateUserByIdAsync(userId, request);
+        var response = await userService.UpdateUserByIdAsync(userId, request);
+
+        UpdateMessage(response.Success, response.Message);
+    }
+
+    private void UpdateMessage(bool success, string responseMessage)
+    {
+        messageColor = success ? "color:green;" : "color:red";
+        message = responseMessage;
     }
 }

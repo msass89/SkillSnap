@@ -7,7 +7,7 @@
         {
             @if(skill != null)
             {
-                <EditSkillTag Name="@skill.Name" Level="@skill.Level" SkillId="@skill.Id" DeleteSkill="NotifyParentDeleteSkill"/>
+                <EditSkillTag SkillName="@skill.Name" Level="@skill.Level" SkillId="@skill.Id" DeleteSkill="NotifyParentDeleteSkill"/>
             }
         }
     }
@@ -28,14 +28,15 @@
     [Parameter]
     public EventCallback<int> DeleteSkill { get; set; }
 
-    private void NotifyParentCreateSkill(CreateSkillRequestDto skill)
+    private async Task NotifyParentCreateSkill(CreateSkillRequestDto skill)
     {
-        SkillAdded.InvokeAsync(skill);
+        Console.WriteLine("NotifyParentCreateSkill");
+        await SkillAdded.InvokeAsync(skill);
     }
 
-    private void NotifyParentDeleteSkill(int id)
+    private async Task NotifyParentDeleteSkill(int id)
     {
-        DeleteSkill.InvokeAsync(id);
+        await DeleteSkill.InvokeAsync(id);
     }
 
 }

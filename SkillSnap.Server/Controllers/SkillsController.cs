@@ -107,11 +107,11 @@ public class SkillsController : ControllerBase
             // invalidate cached skills list after deleting a skill
             _memoryCache.Remove(CacheKeySkills);
 
-            return Ok(new DeleteSkillResponseDto{ Success = true, Message = "Skill deleted successfully."});
+            return Ok(new SuccessResponseDto{ Success = true, Message = "Skill deleted successfully."});
         }
         else
         {
-            return BadRequest(new DeleteSkillResponseDto{ Success = false, Message = "Something went wrong."});
+            return BadRequest(new SuccessResponseDto{ Success = false, Message = "Something went wrong."});
         }
     }
 }

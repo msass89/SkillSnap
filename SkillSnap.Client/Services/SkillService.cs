@@ -65,7 +65,7 @@ namespace SkillSnap.Client.Services
             }
         }
 
-        public async Task<DeleteSkillResponseDto> DeleteSkillByIdAsync (int skillId)
+        public async Task<SuccessResponseDto> DeleteSkillByIdAsync (int skillId)
         {
             try
             {
@@ -82,15 +82,15 @@ namespace SkillSnap.Client.Services
                 };
 
                 // deserialize the json string into an array of type skill
-                var responseDto = JsonSerializer.Deserialize<DeleteSkillResponseDto>(json, options);
+                var responseDto = JsonSerializer.Deserialize<SuccessResponseDto>(json, options);
 
-                return responseDto ?? new DeleteSkillResponseDto { Success = false, Message = "Something went wrong."};
+                return responseDto ?? new SuccessResponseDto { Success = false, Message = "Something went wrong."};
             }
             catch (Exception ex)
             {
                 // Handle exceptions (e.g., log the error)
                 Console.WriteLine($"Error creating skill: {ex.Message}");
-                return new DeleteSkillResponseDto { Success = false, Message = "Something went wrong."};
+                return new SuccessResponseDto { Success = false, Message = "Something went wrong."};
             }
         }
     }

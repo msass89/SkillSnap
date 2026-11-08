@@ -1,8 +1,7 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
-
+﻿
 <!--This component uses the cascading parameters to send information to the components-->
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+    <Router AppAssembly="@typeof(App).Assembly" NotFoundPage="@typeof(Pages.NotFound)">
         <Found Context="routeData">
             <!--With the AuthorizeRouteView component, we can access the authentication state information about the current user in any component we can navigate to-->
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">

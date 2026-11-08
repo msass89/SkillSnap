@@ -1,7 +1,8 @@
 @page "/register"
-@inject AuthService authService
+@inject AuthService AuthService;
+@inject NavigationManager NavigationManager;
 
-<EditForm Model="@registrationModel" OnValidSubmit="@HandleValidSubmit">
+<EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator /> <!-- Enables validation based on attributes -->
 
     <div class="form-container">
@@ -10,22 +11,22 @@
         <hr />
 
         <div class="form-floating mb-3">
-            <InputText @bind-Value="registrationModel.FullName" class="form-control" aria-required="true" placeholder="John Doe" />
+            <InputText @bind-Value="registrationModel.FullName" class="form-control" placeholder="John Doe" />
             <label asp-for="Input.DisplayName">Full Name</label>
             <ValidationMessage For="@(() => registrationModel.FullName)" />
         </div>
         <div class="form-floating mb-3">
-            <InputText @bind-Value="registrationModel.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+            <InputText @bind-Value="registrationModel.Email" class="form-control" placeholder="name@example.com" />
             <label asp-for="Input.Email">Email</label>
             <ValidationMessage For="@(() => registrationModel.Email)" />
         </div>
         <div class="form-floating mb-3">
-            <InputText @bind-Value="registrationModel.Password" type="password" class="form-control" aria-required="true" placeholder="password" />
+            <InputText @bind-Value="registrationModel.Password" type="password" class="form-control" placeholder="password" />
             <label asp-for="Input.Password">Password</label>
             <ValidationMessage For="@(() => registrationModel.Password)" />
         </div>
         <div class="form-floating mb-3">
-            <InputText @bind-Value="registrationModel.ConfirmPassword" type="password" class="form-control" aria-required="true" placeholder="password" />
+            <InputText @bind-Value="registrationModel.ConfirmPassword" type="password" class="form-control" placeholder="password" />
             <label asp-for="Input.ConfirmPassword">Confirm Password</label>
             <ValidationMessage For="@(() => registrationModel.ConfirmPassword)" />
         </div>
@@ -36,8 +37,6 @@
 </EditForm>
 
 @code {
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
     private RegistrationModel registrationModel = new();
     bool registrationResult = false;
 
@@ -45,14 +44,14 @@
 
     private async Task HandleValidSubmit()
     {
-        registrationResult = await authService.Register(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
+        registrationResult = await AuthService.RegisterAsync(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
 
         if(!registrationResult)
             ErrorMessage = "User registration was not successful";
         else
         {
             // login if registration was succesfull
-            TokenResponseDto responseDto = await authService.LoginAsync(new LoginRequestDto(registrationModel.Email, registrationModel.Password));
+            TokenResponseDto responseDto = await AuthService.LoginAsync(new LoginRequestDto(registrationModel.Email, registrationModel.Password));
             if (!responseDto.IsAuthSuccessful)
             {
                 ErrorMessage = responseDto.ErrorMessage;

@@ -1,0 +1,54 @@
+@if(addProject)
+{
+    <EditForm Model="@editProjectModel" OnValidSubmit="NotifyParent">
+        <DataAnnotationsValidator/>
+    
+        <label for="project-title">Title: </label>
+        <InputTextArea class="big-input" id="project-title" @bind-Value="@editProjectModel.ProjectTitle"></InputTextArea>
+        <ValidationMessage For="@(() => editProjectModel.ProjectTitle)" />
+        <label for="project-description">Description: </label>
+        <InputTextArea class="big-input" id="project-description" @bind-Value="@editProjectModel.ProjectDescription"></InputTextArea>
+        <ValidationMessage For="@(() => editProjectModel.ProjectDescription)" />
+        <div style="display:flex;justify-content:flex-end;">
+            <button style="text-align:right" type="button" class="btn btn-secondary" @onclick="ToggleEditing">Skip</button>
+            &nbsp;
+            <button style="text-align:right" type="submit" class="btn btn-success">Save</button>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div style="display:flex;justify-content:flex-end;">
+        <button style="text-align:right" class="btn btn-primary" @onclick="ToggleEditing">Add Project</button>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<CreateProjectRequestDto> CreateProject { get; set; }
+    private EditProjectModel editProjectModel = new();
+
+    private bool addProject = false;
+
+    private void ToggleEditing()
+    {
+        addProject = !addProject;
+    }
+ 
+    private async Task NotifyParent()
+    {
+        var project = new CreateProjectRequestDto
+        {
+            Title = editProjectModel.ProjectTitle,
+            Description = editProjectModel.ProjectDescription,
+            ImageUrl = "",
+            ApplicationUserId = string.Empty
+        };
+
+        await CreateProject.InvokeAsync(project);
+
+        addProject = false;
+    }
+}

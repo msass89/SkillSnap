@@ -66,7 +66,7 @@ public class ProjectServices
         }
     }
 
-    public async Task<DeleteProjectResponseDto> DeleteProjectByIdAsync (int projectlId)
+    public async Task<SuccessResponseDto> DeleteProjectByIdAsync (int projectlId)
         {
             try
             {
@@ -83,15 +83,15 @@ public class ProjectServices
                 };
 
                 // deserialize the json string into an array of type skill
-                var responseDto = JsonSerializer.Deserialize<DeleteProjectResponseDto>(json, options);
+                var responseDto = JsonSerializer.Deserialize<SuccessResponseDto>(json, options);
 
-                return responseDto ?? new DeleteProjectResponseDto { Success = false, Message = "Something went wrong."};
+                return responseDto ?? new SuccessResponseDto { Success = false, Message = "Something went wrong."};
             }
             catch (Exception ex)
             {
                 // Handle exceptions (e.g., log the error)
                 Console.WriteLine($"Error creating skill: {ex.Message}");
-                return new DeleteProjectResponseDto { Success = false, Message = "Something went wrong."};
+                return new SuccessResponseDto { Success = false, Message = "Something went wrong."};
             }
         }
     

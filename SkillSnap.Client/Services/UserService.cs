@@ -64,7 +64,7 @@ namespace SkillSnap.Client.Services
             }
         }
 
-        public async Task<string> UpdateUserByIdAsync(string id, PortfolioUserDto portfolioUserDto)
+        public async Task<SuccessResponseDto> UpdateUserByIdAsync(string id, PortfolioUserDto portfolioUserDto)
         {
             try
             {
@@ -73,12 +73,22 @@ namespace SkillSnap.Client.Services
 
                 response.EnsureSuccessStatusCode();
 
-                return "User profile updated successfully";
+                var json = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                // deserialize the json string into an array of type skill
+                var successResponse = JsonSerializer.Deserialize<SuccessResponseDto>(json, options);
+
+                return successResponse ?? new SuccessResponseDto { Success = false, Message = "Something went wrong."};
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching user: {ex.Message}");
-                return "Update was not successfull";
+                return new SuccessResponseDto { Success = false, Message = "Something went wrong."};
             }
         }
     }
