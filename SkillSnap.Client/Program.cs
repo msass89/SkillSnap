@@ -4,6 +4,9 @@ using SkillSnap.Client.Components;
 using SkillSnap.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
+using System.Security.Claims;
+using System.Globalization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -18,8 +21,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddAuthorizationCore(); //adds authorization service
-
+builder.Services.AddAuthorizationCore();
 
 builder.Services.AddScoped<AuthStateProvider>();
 

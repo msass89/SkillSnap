@@ -1,0 +1,58 @@
+
+@if(OwnProfile)
+{
+    <label for="projects"><b>Projects:</b></label>
+    <br />
+    <div id="projects" class="skill-container">
+        @foreach (var project in Projects)
+        {
+            <EditProject ProjectId="@project.Id" Title="@project.Title" Description="@project.Description"
+                         DeleteProject="NotifyParentDeleteProject"></EditProject>
+        }
+        <AddProject CreateProject="NotifyParentCreateProject"></AddProject>
+    </div>
+}
+else
+{
+    @if(Projects != null || Projects?.Count <= 0)
+    {
+        @foreach (var project in Projects)
+        {
+            <Project Title="@project.Title" Description="@project.Description" />
+        }
+    }
+}
+
+
+@code {
+    [CascadingParameter]
+    public bool OwnProfile { get; set; } = false;
+
+    [Parameter]
+    public List<ProjectResponseDto> Projects { get; set; } = new ();
+
+    [Parameter]
+    public EventCallback<CreateProjectRequestDto> CreateProject { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteProject { get; set; }
+
+    private List<ProjectResponseDto> projects = new();
+
+    protected override void OnParametersSet()
+    {
+        projects = Projects;   
+    }
+
+    private async Task NotifyParentCreateProject(CreateProjectRequestDto project)
+    {
+        await CreateProject.InvokeAsync(project);
+    }
+
+    private async Task NotifyParentDeleteProject(int projectId)
+    {
+        await DeleteProject.InvokeAsync(projectId);
+    }
+
+}
+

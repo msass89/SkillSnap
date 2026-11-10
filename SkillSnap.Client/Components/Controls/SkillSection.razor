@@ -1,0 +1,71 @@
+
+@if(OwnProfile)
+{
+    <label for="bio"><b>Skills:</b></label>
+    <br />
+    <div class="skill-container">
+        @if (skillResponseDtoList != null && skillResponseDtoList?.Count > 0)
+        {
+            @foreach (var skill in skills)
+            {
+                @if (skill != null)
+                {
+                    <EditSkillTag SkillName="@skill.Name" Level="@skill.Level" SkillId="@skill.Id"
+                                  DeleteSkill="NotifyParentDeleteSkill" />
+                }
+            }
+        }
+        else
+        {
+            <p class="card-text" style="font-style:italic">Add some skills here...</p>
+        }
+        <AddSkillTag SkillAdded="NotifyParentCreateSkill" />
+    </div>
+}
+else
+{
+    @if(skills != null || skills?.Count <= 0)
+    {
+        @foreach(var skill in skills)
+        {
+            @if(skill != null)
+            {
+                <SkillTag SkillName="@skill.Name" Level="@skill.Level"/>
+            }
+        }
+    }
+}
+
+
+@code {
+    [CascadingParameter]
+    public bool OwnProfile { get; set; } = false;
+
+    [Parameter]
+    public List<SkillResponseDto> skillResponseDtoList {get; set;} = new();
+
+    [Parameter]
+    public EventCallback<CreateSkillRequestDto> SkillAdded { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteSkill { get; set; }
+
+    private List<SkillResponseDto> skills = new();
+
+    protected override void OnParametersSet()
+    {
+        skills = skillResponseDtoList;   
+    }
+
+    private async Task NotifyParentCreateSkill(CreateSkillRequestDto skill)
+    {
+        Console.WriteLine("NotifyParentCreateSkill");
+        await SkillAdded.InvokeAsync(skill);
+    }
+
+    private async Task NotifyParentDeleteSkill(int id)
+    {
+        await DeleteSkill.InvokeAsync(id);
+    }
+
+}

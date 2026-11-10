@@ -10,7 +10,7 @@
             @foreach (PortfolioUserDto portfolioUser in portfolioUserList) {
                 if(portfolioUser != null)
                 {
-                    <ProfileCard Name="@portfolioUser.FullName" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfileCard>
+                    <ProfilePreview UserId="@portfolioUser.UserId" Name="@portfolioUser.FullName" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfilePreview>
                 }
             }
         }

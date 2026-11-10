@@ -14,7 +14,7 @@ public class SkillsController : ControllerBase
 {
     private readonly SkillSnapContext _context;
     private readonly IMemoryCache _memoryCache;
-    private const string CacheKeySkills = "skills_all";
+    //private const string CacheKeySkills = "skills_all";
 
     public SkillsController(SkillSnapContext context, IMemoryCache memoryCache)
     {
@@ -26,7 +26,7 @@ public class SkillsController : ControllerBase
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetSkillsByUser(string userId)
     {
-        if (!_memoryCache.TryGetValue(CacheKeySkills, out List<SkillResponseDto>? cachedSkillsDtoList))
+        if (!_memoryCache.TryGetValue(userId, out List<SkillResponseDto>? cachedSkillsDtoList))
         {
             // If the cache does not contain the skills, retrieve them from the database
             var skillItems = await _context.Skills
@@ -45,7 +45,7 @@ public class SkillsController : ControllerBase
                 .SetAbsoluteExpiration(TimeSpan.FromSeconds(30)); // Cache for 30 seconds
 
             // Save data in cache
-            _memoryCache.Set(CacheKeySkills, skillItems, cacheEntryOptions);
+            _memoryCache.Set(userId, skillItems, cacheEntryOptions);
             cachedSkillsDtoList = skillItems;
         }
 
@@ -75,7 +75,7 @@ public class SkillsController : ControllerBase
         if(result > 0)
         {
             // invalidate cached skills list after creating a new skill
-            _memoryCache.Remove(CacheKeySkills);
+            _memoryCache.Remove(createSkillDto.ApplicationUserId);
             
             return Ok(new SkillResponseDto { Id = skill.Id, Name = skill.Name, Level = skill.Level, Success = true, Message = "Skill created successfully" });
         }
@@ -105,7 +105,7 @@ public class SkillsController : ControllerBase
         if(result>0)
         {
             // invalidate cached skills list after deleting a skill
-            _memoryCache.Remove(CacheKeySkills);
+            _memoryCache.Remove(skill.ApplicationUserId);
 
             return Ok(new SuccessResponseDto{ Success = true, Message = "Skill deleted successfully."});
         }

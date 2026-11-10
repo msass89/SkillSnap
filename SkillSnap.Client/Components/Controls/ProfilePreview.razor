@@ -1,3 +1,5 @@
+@inject NavigationManager NavigationManager;
+
 
 <div class="card">
     <div class="card-body text-center">
@@ -18,17 +20,27 @@
             <p class="card-text">@Bio</p>
         }
     </div>
+    <div>
+        <button class="btn btn-primary" @onclick="SeeDetails">See Details</button>
+    </div>
 </div>
 
 @code {
+    [Parameter]
+    public string UserId { get; set; } = "";
 
     [Parameter]
-    public string? Name { get; set; }
+    public string Name { get; set; } = "";
 
     [Parameter]
-    public string? Bio { get; set; }
+    public string Bio { get; set; } = "";
 
     [Parameter]
     public string? ProfilePictureUrl { get; set; }
+
+    private void SeeDetails()
+    {
+        NavigationManager.NavigateTo($"/userprofile/{UserId}");
+    }
 
 }

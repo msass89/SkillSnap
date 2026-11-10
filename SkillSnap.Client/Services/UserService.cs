@@ -69,6 +69,7 @@ namespace SkillSnap.Client.Services
             try
             {
                 var url = $"server/user/{id}";
+                Console.WriteLine("Url: " + url);
                 var response = await _httpClient.PutAsJsonAsync(url, portfolioUserDto);
 
                 response.EnsureSuccessStatusCode();

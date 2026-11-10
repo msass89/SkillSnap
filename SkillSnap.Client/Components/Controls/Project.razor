@@ -1,0 +1,17 @@
+<div style="margin-bottom:10px;">
+    <div class="card mb-1 card-body">
+        <h5 class="card-title">@Title</h5>
+        <p class="card-text">@Description</p>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public string Description { get; set; } = "";
+
+}

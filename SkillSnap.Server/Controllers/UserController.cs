@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 [Authorize]
 [ApiController]
@@ -27,6 +28,7 @@ public class UserController : ControllerBase
                     .AsNoTracking()
                     .Select(user => new PortfolioUserDto
                     {
+                        UserId = user.Id,
                         FullName = user.FullName,
                         Bio = user.Bio,
                         ProfileImageUrl = user.ProfileImageUrl
@@ -72,7 +74,7 @@ public class UserController : ControllerBase
 
             if (!result.Succeeded)
             {
-                return BadRequest(new SuccessResponseDto { Success = false, Message = "Something went wrong"});
+                return BadRequest(new SuccessResponseDto { Success = false, Message = "Bad request"});
             }
             else
             {

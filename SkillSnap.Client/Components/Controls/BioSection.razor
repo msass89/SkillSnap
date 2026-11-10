@@ -1,0 +1,79 @@
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
+
+@if(OwnProfile)
+{
+    <label for="bio"><b>Bio:</b></label>
+    <br />
+    @if (!editBio)
+    {
+        @if (!string.IsNullOrEmpty(Bio))
+        {
+            <p class="card-text">@Bio</p>
+        }
+        else
+        {
+            <p class="card-text" style="font-style:italic">Please give a short description about yourself...</p>
+        }
+        <div style="display:flex;justify-content:flex-end;">
+            <button style="text-align:right" class="btn btn-primary" @onclick="ToggleEditing">Edit Bio</button>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="@editBioModel" OnValidSubmit="NotifyParent">
+            <DataAnnotationsValidator />
+
+            <InputTextArea class="big-input" id="bio" @bind-Value="@editBioModel.Bio" />
+            <ValidationMessage For="@(() => editBioModel.Bio)" />
+            <div style="display:flex;justify-content:flex-end;">
+                <button style="text-align:right" type="button" class="btn btn-secondary" @onclick="ToggleEditing">Skip</button>
+                &nbsp;
+                <button style="text-align:right" type="submit" class="btn btn-success">Save</button>
+            </div>
+        </EditForm>
+    }
+}
+else
+{
+    @if(!string.IsNullOrWhiteSpace(Bio))
+    {
+        <label for="bio"><b>Bio:</b></label>
+        <br />
+        <p class="card-text">@Bio</p>
+    }
+}
+
+
+@code {
+    [CascadingParameter]
+    public bool OwnProfile { get; set; } = false;
+
+    private bool editBio = false;
+
+    private EditBioModel editBioModel = new();
+
+    [Parameter]
+    public string Bio { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> BioChanged { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        editBioModel.Bio = Bio ?? "";
+    }
+
+    private void ToggleEditing()
+    {
+        editBioModel.Bio = Bio;
+        editBio = !editBio;
+    }
+ 
+    public async Task NotifyParent()
+    {
+        await BioChanged.InvokeAsync(editBioModel.Bio);
+        editBio = false;
+    }
+}

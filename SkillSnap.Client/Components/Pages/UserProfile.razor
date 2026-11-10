@@ -1,46 +1,45 @@
-@page "/myprofile"
+@page "/userprofile/{userId}"
 @using System.Security.Claims
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using SkillSnap.Shared
-@attribute [Authorize]
+
 @inject UserService userService;
 @inject SkillService skillService;
 @inject ProjectServices projectService;
-@inject AuthenticationStateProvider authenticationStateProvider;
+@inject AuthenticationStateProvider authStateProvider;
 
 <AuthorizeView Roles="User">
-    <Authorized Context="authContext">
+    <Authorized>
+        
         @if(portfolioUserDto == null)
         {
             <p>Load data...</p>
         }
-        else
+        else 
         {
-            <!--<EditForm Model="@completeProfileModel" OnSubmit="@SaveChanges">
-                <DataAnnotationsValidator />-->
+            <CascadingValue TValue="bool" Value="@OwnProfile">
                 <div class="form-container">
                     <h1 class="text-center">Your profile</h1>
                     <hr />
                     <div class="form-group m-3 text-center">
-                        <EditProfilePicture ProfileImageUrl="@portfolioUserDto.ProfileImageUrl" PictureChanged="OnPictureChanged"/>
+                        <ProfilePictureSection ProfileImageUrl="@portfolioUserDto.ProfileImageUrl" PictureChanged="OnPictureChanged"/>
                         <h5 class="card-title">@portfolioUserDto.FullName</h5>
                     </div>
                     <div class="form-group m-3">
-                        <EditBio Bio="@portfolioUserDto.Bio" BioChanged="OnBioChanged"/>
+                        <BioSection Bio="@portfolioUserDto.Bio" BioChanged="OnBioChanged"/>
                     </div>
                     <div class="form-group m-3">
-                        <EditSkill skillResponseDtoList="@skillResponseDtoList" SkillAdded="OnSkillAdded" DeleteSkill="OnSkillDeleted"/>
+                        <SkillSection skillResponseDtoList="@skillResponseDtoList" SkillAdded="OnSkillAdded" DeleteSkill="OnSkillDeleted"/>
                     </div>
                     <div class="form-group m-3">
-                        <EditProjectList Projects="@projectResponseDtoList" CreateProject="OnProjectAdded" DeleteProject="OnProjectDelete"></EditProjectList>
+                        <ProjectsSection Projects="@projectResponseDtoList" CreateProject="OnProjectAdded" DeleteProject="OnProjectDelete"/>
                     </div>
                     @if(!string.IsNullOrWhiteSpace(message))
                     {
                         <p style="@messageColor">@message</p>
                     }
                 </div>
-            <!--</EditForm>-->
+            </CascadingValue>
         }
     </Authorized>
     <NotAuthorized>
@@ -49,28 +48,45 @@
 </AuthorizeView>
 
 @code {
+    private bool OwnProfile = false;
     private string message = string.Empty;
     private string messageColor = string.Empty;
     private PortfolioUserDto? portfolioUserDto;
-    private string? userId;
 
-    private List<SkillResponseDto>? skillResponseDtoList;
-    private List<ProjectResponseDto>? projectResponseDtoList;
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    private List<SkillResponseDto> skillResponseDtoList = new();
+    private List<ProjectResponseDto>? projectResponseDtoList = new ();
+
+    protected override async Task OnParametersSetAsync()
     {
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        await LoadData();
 
-        Console.WriteLine("UserId: " + userId);
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var authUserId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        if(userId != null)
+        if(UserId == authUserId)
         {
-            portfolioUserDto = await userService.GetUserByIdAsync(userId);
-            skillResponseDtoList = await skillService.GetSkillsByUserAsync(userId);
-            projectResponseDtoList = await projectService.GetProjectsAsync(userId);
+            OwnProfile = true;
         }
     }
+
+    private async Task LoadData()
+    {
+        var skillsTask = skillService.GetSkillsByUserAsync(UserId);
+        var userTask = userService.GetUserByIdAsync(UserId);
+        var projectsTask = projectService.GetProjectsAsync(UserId);
+
+        await Task.WhenAll(skillsTask, userTask, projectsTask);
+
+        skillResponseDtoList = await skillsTask;
+        portfolioUserDto = await userTask;
+        projectResponseDtoList = await projectsTask;
+
+        StateHasChanged();
+    }
+
 
     private async Task OnBioChanged(string newBio)
     {
@@ -88,14 +104,14 @@
 
     private async Task OnSkillAdded(CreateSkillRequestDto skill)
     {
-        if (userId == null)
+        if (UserId == null)
             return;
 
         var createSkillDto = new CreateSkillRequestDto
         {
             Name = skill.Name,
             Level = skill.Level,
-            ApplicationUserId = userId
+            ApplicationUserId = UserId
         };
 
         var response = await skillService.CreateSkillAsync(createSkillDto);
@@ -105,7 +121,6 @@
 
         if(response.Success)
         {
-            Console.WriteLine(response.Name, response.Level);
             skillResponseDtoList?.Add(response);
 
             StateHasChanged();
@@ -134,7 +149,7 @@
 
     private async Task OnProjectAdded(CreateProjectRequestDto project)
     {
-        if (userId == null)
+        if (UserId == null)
             return;
 
         var createProjectRequestDto = new CreateProjectRequestDto
@@ -142,7 +157,7 @@
             Title = project.Title,
             Description = project.Description,
             ImageUrl = project.ImageUrl,
-            ApplicationUserId = userId
+            ApplicationUserId = UserId
         };
 
         var response = await projectService.CreateProjectAsync(createProjectRequestDto);
@@ -181,17 +196,18 @@
 
     private async Task SaveProfileChanges()
     {
-        if(portfolioUserDto == null || userId == null)
+        if(portfolioUserDto == null || UserId == null)
             return;
 
         PortfolioUserDto request = new PortfolioUserDto
         {
+            UserId = UserId,
             FullName = portfolioUserDto.FullName,
             Bio = portfolioUserDto.Bio,
             ProfileImageUrl = portfolioUserDto.ProfileImageUrl
         };
 
-        var response = await userService.UpdateUserByIdAsync(userId, request);
+        var response = await userService.UpdateUserByIdAsync(UserId, request);
 
         UpdateMessage(response.Success, response.Message);
     }

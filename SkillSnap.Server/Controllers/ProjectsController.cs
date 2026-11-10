@@ -14,7 +14,7 @@ public class ProjectsController : ControllerBase
 {
     private readonly SkillSnapContext _context;
     private readonly IMemoryCache _memoryCache;
-    private const string CacheKeyProjects = "projects_all";
+    //private const string CacheKeyProjects = "projects_all";
 
     public ProjectsController(SkillSnapContext context, IMemoryCache memoryCache)
     {
@@ -26,7 +26,7 @@ public class ProjectsController : ControllerBase
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetProjectsByUserId(string userId)
     {
-        if (!_memoryCache.TryGetValue(CacheKeyProjects, out List<ProjectResponseDto>? cachedProjectsDtoList))
+        if (!_memoryCache.TryGetValue(userId, out List<ProjectResponseDto>? cachedProjectsDtoList))
         {
             // If the cache does not contain the projects, retrieve them from the database
             var items = await _context.Projects
@@ -45,7 +45,7 @@ public class ProjectsController : ControllerBase
                 .SetAbsoluteExpiration(TimeSpan.FromSeconds(30)); // Cache for 30 seconds
 
             // Save data in cache
-            _memoryCache.Set(CacheKeyProjects, items, cacheEntryOptions);
+            _memoryCache.Set(userId, items, cacheEntryOptions);
             cachedProjectsDtoList = items;
         }
 
@@ -81,7 +81,7 @@ public class ProjectsController : ControllerBase
         if(result > 0)
         {
             // invalidate cached projects list after creating a new project
-            _memoryCache.Remove(CacheKeyProjects);
+            _memoryCache.Remove(createProjectDto.ApplicationUserId);
 
             // return the created project as a DTO
             ProjectResponseDto projectResponseDto = new ProjectResponseDto
@@ -125,7 +125,7 @@ public class ProjectsController : ControllerBase
         if(result > 0)
         {
             // invalidate cached projects list after deleting a project
-            _memoryCache.Remove(CacheKeyProjects);
+            _memoryCache.Remove(project.ApplicationUserId);
 
             return Ok(new SuccessResponseDto{ Success = true, Message = $"Project deleted successfully."});
         }

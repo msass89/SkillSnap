@@ -1,6 +1,6 @@
 
 <div class="skill-tag">
-    <p>@Name</p>
+    <p>@SkillName</p>
     <div>
         @for (int i = 1; i <= 5; i++)
         {
@@ -14,8 +14,9 @@
 
 @code {
     [Parameter]
-    public string Name { get; set; } = "";
+    public string SkillName { get; set; } = "";
 
     [Parameter]
     public int Level { get; set; }
+
 }
