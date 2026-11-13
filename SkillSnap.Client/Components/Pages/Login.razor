@@ -1,8 +1,8 @@
 @page "/login"
 @using System.Security.Claims
-@inject AuthService AuthService;
-@inject NavigationManager NavigationManager;
-@inject AuthenticationStateProvider AuthStateProvider;
+@inject AuthService authService;
+@inject NavigationManager navigationManager;
+@inject AuthenticationStateProvider authStateProvider;
 
 
 @if (ShowAuthError)
@@ -57,7 +57,7 @@
             password: loginModel.Password
         );
 
-        TokenResponseDto result = await AuthService.LoginAsync(loginRequestDto);
+        TokenResponseDto result = await authService.LoginAsync(loginRequestDto);
         
         if (!result.IsAuthSuccessful)
         {
@@ -66,10 +66,10 @@
         }
         else
         {
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var authState = await authStateProvider.GetAuthenticationStateAsync();
             var userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            NavigationManager.NavigateTo($"/userprofile/{userId}"); 
+            navigationManager.NavigateTo($"/userprofile/{userId}"); 
         }
     }
 }

@@ -27,12 +27,12 @@ namespace SkillSnap.Client.Services
                 };
 
                 // deserialize the json string into an array of type skill
-                var skills = JsonSerializer.Deserialize<PortfolioUserDto[]>(json, options);
-                return skills?.ToList() ?? new List<PortfolioUserDto>();
+                var users = JsonSerializer.Deserialize<PortfolioUserDto[]>(json, options);
+                return users?.ToList() ?? new List<PortfolioUserDto>();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching skills: {ex.Message}");
+                Console.WriteLine($"Error fetching user: {ex.Message}");
                 return new List<PortfolioUserDto>();
             }
             
@@ -64,13 +64,45 @@ namespace SkillSnap.Client.Services
             }
         }
 
-        public async Task<SuccessResponseDto> UpdateUserByIdAsync(string id, PortfolioUserDto portfolioUserDto)
+        public async Task<bool> RegisterAsync(string fullName, string email, string password)
         {
             try
             {
-                var url = $"server/user/{id}";
-                Console.WriteLine("Url: " + url);
-                var response = await _httpClient.PutAsJsonAsync(url, portfolioUserDto);
+                RegisterRequestDto registerRequest = new RegisterRequestDto
+                {
+                    FullName = fullName,
+                    Email = email,
+                    Password = password
+                };
+
+                HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
+                    "http://localhost:5029/server/user/register",
+                    registerRequest
+                );
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error: {response.StatusCode} - {error}");
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception accured: {e.Message}");
+                return false;
+            }
+        }
+
+        public async Task<SuccessResponseDto> UpdateUserByIdAsync(PortfolioUserDto portfolioUserDto)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync("server/user", portfolioUserDto);
 
                 response.EnsureSuccessStatusCode();
 

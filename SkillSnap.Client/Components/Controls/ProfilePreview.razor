@@ -20,8 +20,8 @@
             <p class="card-text">@Bio</p>
         }
     </div>
-    <div>
-        <button class="btn btn-primary" @onclick="SeeDetails">See Details</button>
+    <div class="card-body text-center">
+        <button class="btn btn-primary" @onclick="ViewDetails">View Details</button>
     </div>
 </div>
 
@@ -38,7 +38,7 @@
     [Parameter]
     public string? ProfilePictureUrl { get; set; }
 
-    private void SeeDetails()
+    private void ViewDetails()
     {
         NavigationManager.NavigateTo($"/userprofile/{UserId}");
     }

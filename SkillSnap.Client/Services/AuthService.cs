@@ -23,39 +23,39 @@ namespace SkillSnap.Client.Services
             _localStorage = localStorage;
         }
 
-        public async Task<bool> RegisterAsync(string fullName, string email, string password)
-        {
-            try
-            {
-                RegisterRequestDto registerRequest = new RegisterRequestDto
-                {
-                    FullName = fullName,
-                    Email = email,
-                    Password = password
-                };
+        // public async Task<bool> RegisterAsync(string fullName, string email, string password)
+        // {
+        //     try
+        //     {
+        //         RegisterRequestDto registerRequest = new RegisterRequestDto
+        //         {
+        //             FullName = fullName,
+        //             Email = email,
+        //             Password = password
+        //         };
 
-                HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
-                    "http://localhost:5029/server/auth/register",
-                    registerRequest
-                );
+        //         HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
+        //             "http://localhost:5029/server/user/register",
+        //             registerRequest
+        //         );
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-                else
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error: {response.StatusCode} - {error}");
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Exception accured: {e.Message}");
-                return false;
-            }
-        }
+        //         if (response.IsSuccessStatusCode)
+        //         {
+        //             return true;
+        //         }
+        //         else
+        //         {
+        //             string error = await response.Content.ReadAsStringAsync();
+        //             Console.WriteLine($"Error: {response.StatusCode} - {error}");
+        //             return false;
+        //         }
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine($"Exception accured: {e.Message}");
+        //         return false;
+        //     }
+        // }
 
         public async Task<TokenResponseDto> LoginAsync(LoginRequestDto loginRequest)
         {

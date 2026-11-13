@@ -14,7 +14,7 @@ public class ProjectsController : ControllerBase
 {
     private readonly SkillSnapContext _context;
     private readonly IMemoryCache _memoryCache;
-    //private const string CacheKeyProjects = "projects_all";
+    private const string CacheKeyProjectsPrefix = "projects_";
 
     public ProjectsController(SkillSnapContext context, IMemoryCache memoryCache)
     {
@@ -26,10 +26,10 @@ public class ProjectsController : ControllerBase
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetProjectsByUserId(string userId)
     {
-        if (!_memoryCache.TryGetValue(userId, out List<ProjectResponseDto>? cachedProjectsDtoList))
+        if (!_memoryCache.TryGetValue(CacheKeyProjectsPrefix + userId, out List<ProjectResponseDto>? cachedProjectsDtoList))
         {
             // If the cache does not contain the projects, retrieve them from the database
-            var items = await _context.Projects
+            var projectItems = await _context.Projects
                 .AsNoTracking() // Use AsNoTracking for read-only queries to improve performance
                 .Where(project => project.ApplicationUserId == userId) //filter for a specific ApplicationUserId
                 .Select(project => new ProjectResponseDto
@@ -45,8 +45,8 @@ public class ProjectsController : ControllerBase
                 .SetAbsoluteExpiration(TimeSpan.FromSeconds(30)); // Cache for 30 seconds
 
             // Save data in cache
-            _memoryCache.Set(userId, items, cacheEntryOptions);
-            cachedProjectsDtoList = items;
+            _memoryCache.Set(CacheKeyProjectsPrefix + userId, projectItems, cacheEntryOptions);
+            cachedProjectsDtoList = projectItems;
         }
 
         return Ok(cachedProjectsDtoList);
@@ -81,7 +81,7 @@ public class ProjectsController : ControllerBase
         if(result > 0)
         {
             // invalidate cached projects list after creating a new project
-            _memoryCache.Remove(createProjectDto.ApplicationUserId);
+            _memoryCache.Remove(CacheKeyProjectsPrefix + createProjectDto.ApplicationUserId);
 
             // return the created project as a DTO
             ProjectResponseDto projectResponseDto = new ProjectResponseDto
@@ -125,7 +125,7 @@ public class ProjectsController : ControllerBase
         if(result > 0)
         {
             // invalidate cached projects list after deleting a project
-            _memoryCache.Remove(project.ApplicationUserId);
+            _memoryCache.Remove(CacheKeyProjectsPrefix + project.ApplicationUserId);
 
             return Ok(new SuccessResponseDto{ Success = true, Message = $"Project deleted successfully."});
         }

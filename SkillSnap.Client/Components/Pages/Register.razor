@@ -1,6 +1,9 @@
 @page "/register"
-@inject AuthService AuthService;
-@inject NavigationManager NavigationManager;
+@using System.Security.Claims
+@inject AuthService authService;
+@inject UserService userService;
+@inject NavigationManager navigationManager;
+@inject AuthenticationStateProvider authStateProvider;
 
 <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator /> <!-- Enables validation based on attributes -->
@@ -44,21 +47,23 @@
 
     private async Task HandleValidSubmit()
     {
-        registrationResult = await AuthService.RegisterAsync(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
+        registrationResult = await userService.RegisterAsync(registrationModel.FullName, registrationModel.Email, registrationModel.Password);
 
         if(!registrationResult)
             ErrorMessage = "User registration was not successful";
         else
         {
             // login if registration was succesfull
-            TokenResponseDto responseDto = await AuthService.LoginAsync(new LoginRequestDto(registrationModel.Email, registrationModel.Password));
+            TokenResponseDto responseDto = await authService.LoginAsync(new LoginRequestDto(registrationModel.Email, registrationModel.Password));
             if (!responseDto.IsAuthSuccessful)
             {
                 ErrorMessage = responseDto.ErrorMessage;
             }
             else
             {
-                NavigationManager.NavigateTo("/myprofile");
+                var authState = await authStateProvider.GetAuthenticationStateAsync();
+                var userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                navigationManager.NavigateTo($"/userprofile/{userId}");
             }
         }
         

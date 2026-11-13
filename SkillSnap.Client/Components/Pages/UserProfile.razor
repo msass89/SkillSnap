@@ -7,10 +7,10 @@
 @inject SkillService skillService;
 @inject ProjectServices projectService;
 @inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navigationManager;
 
 <AuthorizeView Roles="User">
     <Authorized>
-        
         @if(portfolioUserDto == null)
         {
             <p>Load data...</p>
@@ -43,7 +43,9 @@
         }
     </Authorized>
     <NotAuthorized>
-        The User is not authorized
+        @{
+            navigationManager.NavigateTo($"/login");
+        }
     </NotAuthorized>
 </AuthorizeView>
 
@@ -207,7 +209,7 @@
             ProfileImageUrl = portfolioUserDto.ProfileImageUrl
         };
 
-        var response = await userService.UpdateUserByIdAsync(UserId, request);
+        var response = await userService.UpdateUserByIdAsync(request);
 
         UpdateMessage(response.Success, response.Message);
     }

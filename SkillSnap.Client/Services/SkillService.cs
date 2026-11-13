@@ -25,8 +25,6 @@ namespace SkillSnap.Client.Services
                     PropertyNameCaseInsensitive = true
                 };
 
-                //Console.WriteLine($"JSON Response: {json}");
-
                 // deserialize the json string into an array of type skill
                 var skills = JsonSerializer.Deserialize<SkillResponseDto[]>(json, options);
                 return skills?.ToList() ?? new List<SkillResponseDto>();

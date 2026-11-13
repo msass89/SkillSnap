@@ -23,26 +23,26 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> CreateUserAsync([FromBody] RegisterRequestDto request)
-    {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
-            return BadRequest("Please enter email and password");
+    // [HttpPost("register")]
+    // public async Task<IActionResult> CreateUserAsync([FromBody] RegisterRequestDto request)
+    // {
+    //     if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+    //         return BadRequest("Please enter email and password");
 
-        var user = new ApplicationUser { UserName = request.Email, Email = request.Email, FullName = request.FullName };
+    //     var user = new ApplicationUser { UserName = request.Email, Email = request.Email, FullName = request.FullName };
 
-        var userCreateResult = await _userManager.CreateAsync(user, request.Password);
+    //     var userCreateResult = await _userManager.CreateAsync(user, request.Password);
 
-        if(!userCreateResult.Succeeded)
-            return BadRequest("User creation failed");
+    //     if(!userCreateResult.Succeeded)
+    //         return BadRequest("User creation failed");
         
-        var addRoleResult = await _userManager.AddToRoleAsync(user, "User");
+    //     var addRoleResult = await _userManager.AddToRoleAsync(user, "User");
 
-        if(!addRoleResult.Succeeded)
-            return BadRequest($"Failed to add a role to the user {user.UserName}");
+    //     if(!addRoleResult.Succeeded)
+    //         return BadRequest($"Failed to add a role to the user {user.UserName}");
 
-        return Ok(new { Message = $"User {user.UserName} created successfully" });
-    }
+    //     return Ok(new { Message = $"User {user.UserName} created successfully" });
+    // }
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([FromBody] LoginRequestDto request)
