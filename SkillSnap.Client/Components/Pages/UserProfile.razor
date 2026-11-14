@@ -1,6 +1,8 @@
 @page "/userprofile/{userId}"
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using SkillSnap.Shared
 
 @inject UserService userService;
@@ -42,11 +44,6 @@
             </CascadingValue>
         }
     </Authorized>
-    <NotAuthorized>
-        @{
-            navigationManager.NavigateTo($"/login");
-        }
-    </NotAuthorized>
 </AuthorizeView>
 
 @code {

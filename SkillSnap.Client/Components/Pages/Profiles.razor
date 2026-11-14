@@ -1,25 +1,7 @@
 @page "/profiles"
 @using SkillSnap.Shared
-@* @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize] *@
 @inject UserService userService;
 
-@* <AuthorizeView Roles="User">
-    <Authorized>
-        @if(portfolioUserList != null && portfolioUserList?.Count != 0)
-        {
-            @foreach (PortfolioUserDto portfolioUser in portfolioUserList) {
-                if(portfolioUser != null)
-                {
-                    <ProfilePreview UserId="@portfolioUser.UserId" Name="@portfolioUser.FullName" Bio="@portfolioUser.Bio" ProfilePictureUrl="@portfolioUser.ProfileImageUrl"></ProfilePreview>
-                }
-            }
-        }
-    </Authorized>
-    <NotAuthorized>
-        The User is not authorized
-    </NotAuthorized>
-</AuthorizeView> *@
 
 @if(portfolioUserList == null)
 {

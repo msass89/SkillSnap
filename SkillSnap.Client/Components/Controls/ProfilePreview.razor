@@ -21,7 +21,15 @@
         }
     </div>
     <div class="card-body text-center">
-        <button class="btn btn-primary" @onclick="ViewDetails">View Details</button>
+        <AuthorizeView Roles="User">
+            <Authorized>
+                <button class="btn btn-primary" @onclick="ViewDetails">View Details</button>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/login" class="btn btn-primary"> Please login to view details</a>
+            </NotAuthorized>
+        </AuthorizeView>
+        
     </div>
 </div>
 
