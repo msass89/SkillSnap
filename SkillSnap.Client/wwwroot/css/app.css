@@ -169,3 +169,19 @@ code {
 .button {
     text-decoration: none;
 }
+
+.profile-image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.edit-profile-button {
+    position: absolute;
+    bottom: 12px;
+    right: -10px;
+    z-index: 10;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+}

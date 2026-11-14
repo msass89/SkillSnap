@@ -1,7 +1,28 @@
 
+
 @if(OwnProfile)
 {
-    <img src="@ProfileImageUrl" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100"@onclick="@ToggleEditing" />
+    @* <img src="@ProfileImageUrl" class="rounded-circle mb-3" alt="Profile Picture" width="100" height="100" @onmouseenter="ToggleEditIcon" @onmouseleave="ToggleEditIcon" @onclick="@ToggleEditing"/>
+    @if (showEditIcon)
+    {
+        <TelerikButton Icon="@FontIcon.Pencil" Size="100"/>
+    } *@
+    <div class="profile-image-container">
+        <img src="@ProfileImageUrl"
+            class="rounded-circle mb-3"
+            alt="Profile Picture"
+            width="100"
+            height="100"
+            @onmouseenter="ToggleEditIcon"
+            @onmouseleave="ToggleEditIcon"
+            @onclick="@ToggleEditing" />
+
+        @if (showEditIcon)
+        {
+            <TelerikButton Icon="@FontIcon.Pencil"
+                Class="edit-profile-button"/>
+        }
+    </div>
     @if (showInput)
     {
         <EditForm Model="@editProfilePictureModel" OnValidSubmit="NotifyParent" OnInvalidSubmit="SetProfileImageToDefault">
@@ -35,6 +56,7 @@ else
 
     private EditProfilePictureModel editProfilePictureModel = new EditProfilePictureModel();
     private bool showInput = false;
+    private bool showEditIcon = false;
     private string imageUrlInput = string.Empty;
 
     [Parameter]
@@ -52,6 +74,11 @@ else
     {
         editProfilePictureModel.ProfileImageUrl = ProfileImageUrl ?? "";
         showInput = !showInput;
+    }
+
+    private void ToggleEditIcon()
+    {
+        showEditIcon = !showEditIcon;
     }
 
     private async Task SetProfileImageToDefault()
