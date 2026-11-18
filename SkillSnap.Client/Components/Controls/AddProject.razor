@@ -4,7 +4,7 @@
         <DataAnnotationsValidator/>
     
         <label for="project-title">Title: </label>
-        <InputTextArea class="big-input" id="project-title" @bind-Value="@editProjectModel.ProjectTitle"></InputTextArea>
+        <InputText class="big-input" id="project-title" @bind-Value="@editProjectModel.ProjectTitle"></InputText>
         <ValidationMessage For="@(() => editProjectModel.ProjectTitle)" />
         <label for="project-description">Description: </label>
         <InputTextArea class="big-input" id="project-description" @bind-Value="@editProjectModel.ProjectDescription"></InputTextArea>
@@ -43,7 +43,6 @@ else
         {
             Title = editProjectModel.ProjectTitle,
             Description = editProjectModel.ProjectDescription,
-            ImageUrl = "",
             ApplicationUserId = string.Empty
         };
 

@@ -54,7 +54,7 @@
         else
         {
             // login if registration was succesfull
-            TokenResponseDto responseDto = await authService.LoginAsync(new LoginRequestDto(registrationModel.Email, registrationModel.Password));
+            TokenResponseDto responseDto = await authService.LoginAsync(new LoginRequestDto{ Email = registrationModel.Email, Password = registrationModel.Password});
             if (!responseDto.IsAuthSuccessful)
             {
                 ErrorMessage = responseDto.ErrorMessage;

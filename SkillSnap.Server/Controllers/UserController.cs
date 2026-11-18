@@ -46,6 +46,7 @@ public class UserController : ControllerBase
 
             // Save data in cache
             _memoryCache.Set(CacheKeyUserPrefix + "all", userList, cacheEntryOptions);
+            cachedUserDtoList = userList;
         }
 
         return Ok(cachedUserDtoList);

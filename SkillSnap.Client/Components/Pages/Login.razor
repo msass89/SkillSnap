@@ -52,10 +52,11 @@
     {
         ShowAuthError = false;
 
-        var loginRequestDto = new LoginRequestDto(
-            email: loginModel.Email,
-            password: loginModel.Password
-        );
+        var loginRequestDto = new LoginRequestDto
+        {
+            Email = loginModel.Email,
+            Password = loginModel.Password
+        };
 
         TokenResponseDto result = await authService.LoginAsync(loginRequestDto);
         
